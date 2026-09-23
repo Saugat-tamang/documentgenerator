@@ -1,0 +1,31 @@
+{% load static %}
+<header class="topbar">
+    <div class="topbar-left">
+        <button class="hamburger" id="hamburger" aria-label="Menu">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+        <div>
+            <div class="page-title" data-i18n="page_title">Overview</div>
+            <div class="page-sub" data-i18n="page_sub">Wednesday, 23 September</div>
+        </div>
+    </div>
+
+    <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" data-i18n-ph="search_ph" placeholder="Search projects, people...">
+    </div>
+
+    <div class="topbar-right">
+        <div class="toggle-pill" id="langToggle">
+            <button data-lang="en" class="on">EN</button>
+            <button data-lang="ne">NE</button>
+        </div>
+        <button class="icon-btn" id="themeToggle" aria-label="Toggle theme">
+            <svg id="themeIconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.2M12 19.8V22M4.2 4.2l1.6 1.6M18.2 18.2l1.6 1.6M2 12h2.2M19.8 12H22M4.2 19.8l1.6-1.6M18.2 5.8l1.6-1.6"/></svg>
+        </button>
+        <button class="icon-btn" aria-label="Notifications">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+            <span class="dot"></span>
+        </button>
+    </div>
+</header>

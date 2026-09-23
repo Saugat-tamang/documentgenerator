@@ -1,0 +1,29 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    {% include 'header.html' %}
+    {% block style %}
+    {% endblock %}
+</head>
+<body>
+    <div class="overlay" id="overlay"></div>
+    <div class="toast" id="toast"></div>
+    <div class="shell">
+        {% include 'sidebar.html' %}
+        <div class="main">
+            {% include 'nav.html' %}
+            <main class="content">
+                {% block content %}
+                {% endblock %}
+            </main>
+        </div>
+    </div>
+    {% block script %}
+    {% include 'footer.html' %}
+    {% endblock %}
+</body>
+</html>
