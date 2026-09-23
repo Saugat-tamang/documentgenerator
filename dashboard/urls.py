@@ -5,7 +5,7 @@ urlpatterns = [
     # -----------------------------
     # Home & General Pages
     # -----------------------------
-    path('', views.index, name='index'),
+    path('home/', views.index, name='index'),
     path('dashboard_list/', views.index_list, name='index.list'),  
     # -----------------------------
     # Client Dashboard

@@ -12,7 +12,6 @@ from DocumentGenerator.decoder import permission_required_redirect
 
 @login_required
 def index(request):
-    try: 
         request.session.pop('client_id', None)
         company_id                          = request.user.company_id
         client                              = ClientRegistration.objects.filter(company_id=company_id).order_by('-created_at').all()[:5]
@@ -28,9 +27,7 @@ def index(request):
             'dashboard_data'                : dashboard_data,
             'dashboard_data_index'          : dashboard_data_index
         }
-        return render(request, 'dashboard/index.html', data) 
-    except:
-        return render(request, 'error.html')
+        return render(request, 'dashboard/index.html', data)
     
     
 @login_required
