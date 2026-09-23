@@ -286,6 +286,11 @@ document.querySelectorAll('.nav-item:not(.nav-parent), .nav-subitem').forEach(bt
     sidebar.classList.remove('open');
     overlay.classList.remove('show');
     if(sidebar.classList.contains('collapsed')) closeAllSubmenus();
+    
+    const url = btn.getAttribute('data-url');
+    if(url){
+        window.location.href = url;
+    }
   });
 });
 
