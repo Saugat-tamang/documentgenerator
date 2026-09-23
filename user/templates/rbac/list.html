@@ -1,0 +1,65 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+{% block style %}
+{% endblock %}
+{% block content %}
+<div class="content-wrapper">
+    <div class="row">
+        <div class="col-12 grid-margin">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mt-2">
+                            <strong class="card-title heading-size fs-5">Assign Permissions(Roles)</strong>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <a href="{% url 'user:createrole' %}" class="btn btn-primary">Add Role</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 grid-margin">
+            <div class="card">
+                <div class="card-body">
+                <div class="container my-3">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="text-center" style="width: 10%;">S.N</th>
+                                <th>Name</th>
+                                <th class="text-center" style="width: 18%;">Permissions</th>
+                                <th class="text-center" style="width: 18%;">Users</th>
+                                <th class="text-center" style="width: 18%;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for role in roles %}
+                            <tr>
+                                <td class="text-center">{{ forloop.counter }}</td>
+                                <td>{{ role.name }}</td>
+                                <td class="text-center">
+                                    <a href="{% url 'user:assignpermissions' role.id %}" class="btn btn-sm btn-primary">Assign Permissions</a>
+                                </td>
+                                <td class="text-center">
+                                    <a href="{% url 'user:assignusers' role.id %}" class="btn btn-sm btn-primary">Assign Users</a>
+                                </td>
+                                <td class="text-center">
+                                    <a href="{% url 'user:roleuserspermissions' %}" class="btn btn-sm btn-outline-primary">View Details</a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center">No roles found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

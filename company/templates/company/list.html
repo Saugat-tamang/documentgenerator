@@ -1,0 +1,82 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+{% block style %}
+{% include 'admin/tablelink.html' %}
+{% endblock %}
+{% block content %}
+<div class="content-wrapper">
+    <div class="row">
+        <div class="col-12 grid-margin">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mt-2">
+                            <strong class="card-title heading-size fs-5">Company List</strong>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <a href="{% url 'company.create' %}" class="btn custom-btn p-3">
+                                <i class="fas fa-plus-circle"></i> Add Company
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- COMPANY DATATABLE -->
+    <div class="row">
+        <div class="col-12 grid-margin">
+            <div class="card">
+                <div class="card-body">
+                    <table id="companyTable" class="display responsive nowrap" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th>S.N</th>
+                                <th>Name</th>
+                                <th>Address</th>
+                                <th>PAN</th>
+                                <th>Province</th>
+                                <th>Email</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block script %}
+{% include 'admin/tablescript.html' %}
+<script>
+$(document).ready(function() {
+    $('#companyTable').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: "{% url 'company.list' %}",
+        columns: [
+            { data: 'sn' },
+            { data: 'name' },
+            { data: 'address' },
+            { data: 'pan' },
+            { data: 'province' },
+            { data: 'email' },
+            { 
+                data: 'id',
+                render: function(data) {
+                    const editUrl = `{% url 'company.edit' 0 %}`.replace('/0/', `/${data}/`);
+                    return `
+                        <a href="${editUrl}" class="btn btn-sm" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </a>`;
+                },
+                orderable: false,
+                searchable: false
+            }
+        ]
+    });
+});
+</script>
+{% endblock %}

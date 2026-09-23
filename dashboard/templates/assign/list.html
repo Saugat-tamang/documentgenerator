@@ -1,0 +1,94 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+{% block style %}
+{% include 'admin/tablelink.html' %}
+{% endblock %}
+{% block content %}
+<div class="content-wrapper">
+    <div class="row">
+        <div class="col-12 grid-margin">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mt-2">
+                            <strong class="card-title heading-size fs-5">Existing Client Details 
+                            </strong>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <button class="btn custom-btn fs-6 p-3 dropdown-toggle" type="button" id="reportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-plus-circle"></i> Insert Client Details
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list pb-0" aria-labelledby="reportDropdown">
+                                <a class="dropdown-item preview-item py-3" href="{% url 'assign_client_to_user' %}">
+                                    <div class="preview-item-content">
+                                        <h6 class="text-wrap preview-subject fw-normal text-dark mb-1 ms-3">Add Configuration
+                                        </h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 grid-margin">
+            <div class="card">
+                <div class="card-body">
+                    <table id="myTable" class="display responsive nowrap table table-bordered w-100"
+                        style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>S.N</th>
+                                <th>Client</th>
+                                <th>Assigned To</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block script %}
+{% include 'admin/tablescript.html' %}
+<script>
+    $(document).ready(function () {
+        if ($.fn.DataTable.isDataTable('#myTable')) {
+            $('#myTable').DataTable().clear().destroy();
+        }
+    
+        const table = $('#myTable').DataTable({
+            responsive: true,
+            processing: true,
+            ajax: {
+                url: "{% url 'dashboard_config_data' %}",
+                dataSrc: 'data'
+            },
+        });
+    
+        $('#myTable').on('change', '.status-dropdown, .assign-to-dropdown', function () {
+            const id = $(this).data('id');
+            const status = $(this).hasClass('status-dropdown') ? $(this).val() : null;
+            const assign_to = $(this).hasClass('assign-to-dropdown') ? $(this).val() : null;
+    
+            $.ajax({
+                url: "{% url 'update_dashboard_config' %}",
+                method: 'POST',
+                headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+                contentType: 'application/json',
+                data: JSON.stringify({ id, status, assign_to }),
+                success: function (response) {
+                    if (response.success) {
+                        console.log('Update successful');
+                    }
+                }
+            });
+        });
+    });
+    </script>
+{% endblock %}

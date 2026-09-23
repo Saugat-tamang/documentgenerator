@@ -1,0 +1,82 @@
+{% extends 'admin/base1.html' %}
+{% load static %}
+{% block style %}
+<style>
+    .tab-options .btn.active {
+        background-color: #0d6efd;
+        color: #fff;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+    <div class="row">
+        <div class="col-12 grid-margin">
+            <div class="card">
+                <div class="card-body">
+                    <div class="col-md-6">
+                        <strong class="card-title heading-size fs-5">Client Status Update</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12 grid-margin">
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST" action="{% url 'client.status.change' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="client_id" value="{{client_id}}">
+                        <input type="hidden" name="vat_return_filing_type" id="vat_return_filing_type" value="{{ client.vat_return_filing_type }}">
+                        
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label for="filing-type" style="font-size: var(--label-size);">Vat Return Filing Type</label>
+                                <div class="tab-options mt-2">
+                                    <button type="button" class="btn btn-outline-primary option-btn me-1" data-value="Monthly">Monthly</button>
+                                    <button type="button" class="btn btn-outline-primary option-btn me-1" data-value="Trimester">Trimester</button>
+                                    <button type="button" class="btn btn-outline-primary option-btn" data-value="Bi-Monthly">Bi-Monthly</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12 mt-4 text-end">
+                            <button type="submit" class="btn btn-primary">Update Status</button>
+                        </div>
+                    </form>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let buttons = document.querySelectorAll(".option-btn");
+        let hiddenInput = document.getElementById("vat_return_filing_type");
+        let currentValue = hiddenInput.value;
+
+        // Set active on load (from DB value)
+        buttons.forEach(btn => {
+            if (btn.dataset.value === currentValue) {
+                btn.classList.add("active");
+            }
+        });
+
+        // On click update hidden input + active state
+        buttons.forEach(btn => {
+            btn.addEventListener("click", function () {
+                buttons.forEach(b => b.classList.remove("active"));
+                this.classList.add("active");
+                hiddenInput.value = this.dataset.value;
+            });
+        });
+    });
+</script>
+{% endblock %}

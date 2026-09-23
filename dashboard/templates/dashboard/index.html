@@ -1,0 +1,282 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+{% block style %}
+<link rel="stylesheet" href="{% static 'assets/css/employee.css' %}">
+{% endblock %}
+{% block content %}
+{% if request.user.is_employee %}
+<div class="content-wrapper">
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="home-tab">
+        <div class="tab-content tab-content-basic">
+          <div class="tab-pane fade show active" id="overview">
+            <div class="container-fluid p-0 me-0">
+              <div class="row g-4">
+                {% for dashboard in dashboard_data %}
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                  <div class="widget-stat shadow-sm">
+                    <h4 class="statistics-title">{{ dashboard.client.name }}</h4>
+                    <div class="widget-content">
+                      <div class="user-info mb-2">
+                        <div class="user-avatar">{{ dashboard.assign_to.username|first|upper }}</div>
+                        <p class="fs-6 text-dark m-0">{{ dashboard.assign_to.username }}</p>
+                      </div>
+                      <div class="vat-info mb-2">
+                        {{ dashboard.client.vat_return_filing_type }}
+                      </div>
+                      <div class="action-buttons">
+                        <a href="{% url 'client_dashboard' dashboard.client.id %}" class="btn-view">
+                          <i class="mdi mdi-eye"></i> View
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+            <!-- Employee view: Latest learning video -->
+            <div class="row mt-3">
+              <div class="col-12">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <div class="fs-6">Latest Tax Advice</div>
+                      <a class="btn btn-sm btn-outline-primary" href="{% url 'lms.videos' %}">All Videos</a>
+                    </div>
+                    <div class="ratio ratio-16x9">
+                      <iframe
+                        src="https://www.youtube.com/embed?listType=user_uploads&list=harishrestha8731&index=0"
+                        title="Latest video"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% else %}
+<div class="content-wrapper">
+  <div class="row">
+    <div class="col-12 grid-margin p-0 mb-0">
+      {% include 'mainnav.html' %}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="home-tab">
+        <div class="tab-content tab-content-basic">
+          <div class="tab-pane fade show active" id="overview">
+            <div class="row">
+              <div class="col-lg-12 d-flex flex-column mb-3">
+                <div class="row flex-grow">
+                 <div class="dashboard-item col-lg-12">
+                    <a href="{% url 'ClientWiseVat_Dashboard' %}" class="text-decoration-none">
+                      <div style="background-color: #e9effc; border-radius: 15px; color: black;" class="card card-rounded text-white">
+                        <div class="card-body">
+                          <h4 class="mb-3 text-dark fs-5">VAT Dashboard</h4>
+                          <h4 class="mb-3 text-dark fs-6 mt-3">{{ request.user.company.fiscal_year.name }}</h4>
+                          <p class="text-dark fs-6 mt-1">View annual profit and tax status here.</p>
+                          <p class="text-dark fs-6 mt-1">
+                            VAT is an indirect tax on goods and services. Consumers pay it, and businesses submit it to the government. In Nepal, the standard VAT rate is 13%.
+                          </p>
+                        </div>
+                      </div>
+                    </a>
+                  </div>
+                </div>
+              </div> 
+              
+              <div class="col-12 grid-margin stretch-card">
+                <div class="card card-rounded">
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-md-12 fs-5">
+                        Monthly Highest Sales & Purchase Clients
+                      </div>
+                    </div>
+                    <div class="row mt-3">
+                      <div class="col-md-12">
+                        <div id="clientChart_vat" style="width:100%;height:500px;"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-12 grid-margin stretch-card">
+                <div class="card card-rounded">
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-md-12 fs-5">
+                        Monthly Highest Sales & Purchase Clients
+                      </div>
+                    </div>
+                    <div class="row mt-3">
+                      <div class="col-md-12">
+                        <div id="clientChart" style="width:100%;height:500px;"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Learning widget: Latest video -->
+            {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="d-sm-flex justify-content-center justify-content-sm-between">
+    <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">FynCoo</span>
+    <span class="float-none float-sm-end d-block mt-1 mt-sm-0 text-center">
+      &copy; 2023. All rights reserved.
+    </span>
+  </div>
+</footer>
+{% if messages %}
+  <div id="popup-message" style="position: fixed; top: 100px; right: 50px; z-index: 9999;">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+  <script>
+    setTimeout(function() {
+      const popup = document.getElementById('popup-message');
+      if (popup) {
+        popup.style.display = 'none';
+      }
+    }, 10000);
+  </script>
+{% endif %}
+{% endblock %}
+{% block script %}
+<script src="{% static 'assets/js/plotdiagram.js' %}"></script>
+<script>
+(async function(){
+    async function fetchJSON(url){
+        const r = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }});
+        if(!r.ok) throw new Error(await r.text());
+        return await r.json();
+    }
+
+    // English → Nepali digits
+    function toNepaliNumber(number) {
+        const engToNep = { "0":"०","1":"१","2":"२","3":"३","4":"४","5":"५","6":"६","7":"७","8":"८","9":"९" };
+        return number.toString().split("").map(d => engToNep[d] || d).join("");
+    }
+
+    // ========= Chart 1: Total (Bar Chart) =========
+    function renderTotalChart(rows){
+        const clients = rows.map(r => r.client);
+        const sales = rows.map(r => r.sales_amount);
+        const purchases = rows.map(r => r.purchase_amount);
+
+        const traces = [
+            {
+                x: clients,
+                y: sales,
+                type: 'bar',
+                name: 'Sales',
+                text: sales.map(v => `नेरू ${toNepaliNumber(v.toLocaleString('en-IN'))}`),
+                hoverinfo: 'text'
+            },
+            {
+                x: clients,
+                y: purchases,
+                type: 'bar',
+                name: 'Purchase',
+                text: purchases.map(v => `नेरू ${toNepaliNumber(v.toLocaleString('en-IN'))}`),
+                hoverinfo: 'text'
+            }
+        ];
+
+        const maxValue = Math.max(...sales.concat(purchases), 0);
+        const ticks = Array.from({length: 6}, (_, i) => Math.round(maxValue * i / 5));
+
+        Plotly.newPlot('clientChart', traces, {
+            title: 'Total Sales & Purchases (Bar Chart)',
+            barmode: 'group',
+            margin: { t: 50, r: 10, l: 150, b: 50 },
+            legend: { orientation: 'h' },
+            yaxis: { 
+                title: 'रकम (नेरू)',
+                tickvals: ticks,
+                ticktext: ticks.map(v => "नेरू " + toNepaliNumber(v.toLocaleString('en-IN')))
+            },
+            xaxis: { title: 'Clients' }
+        }, { responsive: true, displayModeBar: false });
+    }
+
+    // ========= Chart 2: VAT (Line Chart) =========
+    function renderVatChart(rows){
+        const clients = rows.map(r => r.client);
+        const sales = rows.map(r => r.sales_amount_vat);
+        const purchases = rows.map(r => r.purchase_amount_vat);
+
+        const traces = [
+            {
+                x: clients,
+                y: sales,
+                type: 'scatter',
+                mode: 'lines+markers',
+                name: 'Sales (VAT)',
+                text: sales.map(v => `नेरू ${toNepaliNumber(v.toLocaleString('en-IN'))}`),
+                hoverinfo: 'text'
+            },
+            {
+                x: clients,
+                y: purchases,
+                type: 'scatter',
+                mode: 'lines+markers',
+                name: 'Purchase (VAT)',
+                text: purchases.map(v => `नेरू ${toNepaliNumber(v.toLocaleString('en-IN'))}`),
+                hoverinfo: 'text'
+            }
+        ];
+
+        const maxValue = Math.max(...sales.concat(purchases), 0);
+        const ticks = Array.from({length: 6}, (_, i) => Math.round(maxValue * i / 5));
+
+        Plotly.newPlot('clientChart_vat', traces, {
+            title: 'VAT Sales & Purchases (Line Chart)',
+            margin: { t: 50, r: 10, l: 150, b: 50 },
+            legend: { orientation: 'h' },
+            yaxis: { 
+                title: 'रकम (नेरू)',
+                tickvals: ticks,
+                ticktext: ticks.map(v => "नेरू " + toNepaliNumber(v.toLocaleString('en-IN')))
+            },
+            xaxis: { title: 'Clients' }
+        }, { responsive: true, displayModeBar: false });
+    }
+
+    try {
+        // Total chart data
+        const totalData = await fetchJSON('/report/monthly/client/');
+        renderTotalChart(totalData.rows || []);
+
+        // VAT chart data
+        const vatData = await fetchJSON('/report/monthly/client/vat/');
+        renderVatChart(vatData.rows || []);
+    } catch(e) {
+        console.error('Failed to load charts', e);
+    }
+})();
+</script>
+
+
+{% endblock %}

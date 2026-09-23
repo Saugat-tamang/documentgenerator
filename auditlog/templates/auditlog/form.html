@@ -1,0 +1,96 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+{% block style %}
+{% endblock %}
+{% block content %}
+<div class="content-wrapper">
+    <div class="row">
+        <div class="col-12 grid-margin">
+            <div class="card">
+                <div class="card-body">
+                    <div class="col-md-12">
+                        <strong class="card-title heading-size fs-5">Filter Quick Snapshot of Activity
+                        </strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 grid-margin">
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST" id="myForm" action="{% url 'auditlog.list' %}">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <div class="row">
+                                        <div class="col-md-4 mt-2">
+                                            <label for="client" style="font-size: var(--label-size);">Client User:</label>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <select data-placeholder="Select User" class="form-select form-control mySelect" name="user" id="user" tabindex="1" required>
+                                                <option value="">Select User</option>
+                                                {% for i in user_filter_audit_logs %}
+                                                    <option value="{{i.id}}">{{ i.username }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <div class="row">
+                                        <div class="col-md-4 mt-2">
+                                            <label for="name" style="font-size: var(--label-size);">Start Date:</label>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <input type="text" class="form-control nepali-date-client" id="AuditnepaliDate" name="startdate"
+                                                aria-describedby="startdate" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <div class="row">
+                                        <div class="col-md-4 mt-2">
+                                            <label for="address" style="font-size: var(--label-size);">End Date:</label>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <input type="text" class="form-control nepali-date-client" id="AuditnepaliDate1" name="enddate" aria-describedby="enddate" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 text-end">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block script %}
+<script>
+    document.getElementById('myForm').addEventListener('submit', function(event) {
+        let startDate = document.getElementById('AuditnepaliDate').value;
+        let endDate = document.getElementById('AuditnepaliDate1').value;
+
+        if (!startDate || !endDate) {
+            Swal.fire({
+                title: 'Error!',
+                text: !startDate ? 'Please Select the Start Date.' : 'Please Select the End Date.',
+                icon: 'error',
+                confirmButtonText: 'Try again'
+            });
+            event.preventDefault();
+        }
+    });
+</script>
+{% endblock %}

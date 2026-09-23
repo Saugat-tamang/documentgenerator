@@ -1,0 +1,122 @@
+{% extends 'admin/base1.html' %}
+{% load static %}
+
+{% block content %}
+<div class="content-wrapper">
+  <div class="row">
+    <div class="col-12 grid-margin">
+      <div class="card">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <strong class="card-title heading-size fs-5">New Document / Audit Dashboard
+              </strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12 grid-margin">
+      <div class="card">
+        <div class="card-body">
+
+          <!-- Audit KPI & Heatmap -->
+          <div class="row g-3 mb-3">
+            <!-- Compliance Score -->
+            <div class="col-md-4">
+              <div class="p-3 border rounded box-bg h-100 d-flex flex-column justify-content-center align-items-center text-center">
+                <div class="text-muted fw-semibold">Compliance Score</div>
+                <div id="kpiCompliance" class="fs-3 fw-bold my-2">—</div>
+                <div class="small text-muted" id="docCount"></div>
+              </div>
+            </div>
+
+            <!-- Risk Heatmap -->
+            <div class="col-md-8">
+              <div class="p-3 border rounded box-bg h-100">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <div class="text-muted fw-semibold">Risk Heatmap</div>
+                </div>
+                <div id="riskHeatmap" class="rounded" style="height:320px;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Download Button -->
+          <div class="row mb-3">
+            <div class="col-12 d-flex justify-content-end">
+              <a class="btn btn-primary" href="{% url 'audit.pack' %}">
+                <i class="bi bi-download me-1"></i> Download Audit Ready Pack
+              </a>
+            </div>
+          </div>
+
+          <!-- Materiality Table -->
+          <div class="row">
+            <div class="col-12">
+              <div class="card shadow-sm border-0">
+                <div class="card-body">
+                  <h6 class="text-muted fw-semibold mb-3">Materiality — Top Transactions</h6>
+                  <div class="table-responsive">
+                    <table class="table table-striped table-hover align-middle mb-0">
+                      <thead class="table-light">
+                        <tr>
+                          <th>Type</th>
+                          <th>ID</th>
+                          <th>Bill No</th>
+                          <th>Total</th>
+                        </tr>
+                      </thead>
+                      <tbody id="bigTbody"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Plotly JS -->
+<script src="{% static 'assets/js/plotdiagram.js' %}"></script>
+<script>
+  async function loadAudit() {
+    // Load metrics
+    const mRes = await fetch('{% url "audit.metrics" %}');
+    const m = await mRes.json();
+    if (mRes.ok) {
+      document.getElementById('kpiCompliance').textContent = ((m.compliance_score || 0) * 100).toFixed(1) + '%';
+      document.getElementById('docCount').textContent = (m.total_documents || 0) + ' documents checked';
+
+      const tbody = document.getElementById('bigTbody');
+      tbody.innerHTML = (m.big_tickets || []).map(r =>
+        `<tr>
+          <td>${r.type || ''}</td>
+          <td>${r.id || ''}</td>
+          <td>${r.bill_no || ''}</td>
+          <td>${r.total_amount || ''}</td>
+        </tr>`).join('');
+    }
+
+    // Load risk heatmap
+    const rRes = await fetch('{% url "audit.risks" %}');
+    const r = await rRes.json();
+    if (rRes.ok) {
+      const dims = r.dimensions || [];
+      const data = [
+        { x: dims, y: r.sales || [], type: 'bar', name: 'Sales', marker: { color: '#1f77b4' } },
+        { x: dims, y: r.purchases || [], type: 'bar', name: 'Purchases', marker: { color: '#ff7f0e' } }
+      ];
+      Plotly.newPlot('riskHeatmap', data, { barmode: 'group', margin: { t: 30, r: 10, b: 60, l: 40 } }, { responsive: true, displayModeBar:false});
+    }
+  }
+  document.addEventListener('DOMContentLoaded', loadAudit);
+</script>
+{% endblock %}

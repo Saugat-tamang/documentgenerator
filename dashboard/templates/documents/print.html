@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>{{ title }}</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: #111;
+      margin: 24px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .lh {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border-bottom: 2px solid #000;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+    .lh-logo {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+    }
+    .lh-title {
+      flex: 1;
+    }
+    .lh-title h2 {
+      font-size: 22px;
+      margin: 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .lh-meta {
+      font-size: 12px;
+      color: #444;
+      margin-top: 2px;
+    }
+    .qr {
+      width: 80px;
+      height: 80px;
+    }
+    h1 {
+      font-size: 18px;
+      margin: 0 0 12px;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 6px;
+    }
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .field {
+      flex: 1 1 220px;
+      border: 1px solid #ddd;
+      padding: 8px;
+      background: #fafafa;
+      border-radius: 4px;
+    }
+    .label {
+      font-size: 11px;
+      color: #666;
+      margin-bottom: 3px;
+    }
+    .value {
+      font-size: 13px;
+      font-weight: 500;
+      color: #222;
+      min-height: 18px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-bottom: 18px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 6px 8px;
+    }
+    th {
+      background: #f5f5f5;
+      font-weight: 600;
+      font-size: 12px;
+    }
+    td {
+      font-size: 12px;
+    }
+    td.text-end, th.text-end {
+      text-align: right;
+    }
+    .footer {
+      margin-top: 20px;
+      font-size: 12px;
+      color: #555;
+      text-align: center;
+      border-top: 1px dashed #ccc;
+      padding-top: 10px;
+    }
+    .signatory {
+      margin-top: 40px;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .signatory div {
+      text-align: center;
+    }
+    .signatory-line {
+      border-top: 1px solid #444;
+      width: 220px;
+      margin: auto;
+      padding-top: 6px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .notes {
+      margin-top: 16px;
+      font-size: 11px;
+      color: #444;
+      white-space: pre-line;
+      border-top: 1px solid #ddd;
+      padding-top: 8px;
+    }
+    .no-print {
+      text-align: right;
+      margin-bottom: 12px;
+    }
+    .btn, button {
+      display: inline-block;
+      background: #007bff;
+      color: #fff;
+      font-size: 12px;
+      padding: 6px 12px;
+      border-radius: 4px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+    }
+    .btn:hover, button:hover {
+      background: #0056b3;
+    }
+    @media print {
+      .no-print {
+        display: none;
+      }
+      body {
+        margin: 12mm;
+        font-size: 11pt;
+      }
+    }
+  </style>
+  <script>
+    function doPrint() {
+      window.print();
+    }
+  </script>
+</head>
+<body>
+  <div class="no-print">
+    <a href="#" class="btn">Download PDF</a>
+    <button onclick="doPrint()">Print</button>
+  </div>
+
+  <div class="lh">
+    {% if client_logo_url %}
+      <img class="lh-logo" src="{{ client_logo_url }}" alt="Logo">
+    {% endif %}
+    <div class="lh-title">
+      <h2>{{ client.name|default:"Client Company" }}</h2>
+      <div class="lh-meta">
+        {% if client.address %}{{ client.address }}{% endif %}
+        {% if client.pan %} | PAN: {{ client.pan }}{% endif %}
+        {% if client.vat_registration_no %} | VAT: {{ client.vat_registration_no }}{% endif %}
+      </div>
+    </div>
+    {% if qr_data_uri %}
+      <img class="qr" src="{{ qr_data_uri }}" alt="QR">
+    {% endif %}
+  </div>
+
+  <h1>{{ title }}</h1>
+
+  <div class="row">
+    {% if header_items %}
+      {% for hv in header_items %}
+      <div class="field">
+        <div class="label">{{ hv.label }}</div>
+        <div class="value">{{ hv.value }}</div>
+      </div>
+      {% endfor %}
+    {% else %}
+      {% for f in fields %}
+      <div class="field">
+        <div class="label">{{ f }}</div>
+        <div class="value">&nbsp;</div>
+      </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        {% for h in table_headers %}
+        <th>{{ h }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% if doc_rows %}
+        {% for row in doc_rows %}
+        <tr>
+          {% for cell in row %}
+          <td>{{ cell }}</td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      {% else %}
+        {% for i in '12345' %}
+        <tr>
+          {% for h in table_headers %}
+          <td>&nbsp;</td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      {% endif %}
+    </tbody>
+  </table>
+
+  {% if landed_expenses %}
+  <h2 style="font-size:15px; margin:16px 0 8px;">Additional Expenses (Landed Cost)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Expense</th><th>Vendor/Supplier</th><th class="text-end">Amount</th><th>VAT</th><th class="text-end">VAT %</th><th class="text-end">VAT Amt</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for e in landed_expenses %}
+      <tr>
+        <td>{{ e.expense_type }}</td>
+        <td>{{ e.vendor_name }}</td>
+        <td class="text-end">{{ e.amount }}</td>
+        <td>{% if e.is_vat %}Yes{% else %}No{% endif %}</td>
+        <td class="text-end">{{ e.vat_rate }}</td>
+        <td class="text-end">{{ e.vat_amount }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+
+  {% if landed_rows %}
+  <h2 style="font-size:15px; margin:16px 0 8px;">Item Cost Breakdown (After Allocation)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Item</th><th class="text-end">Base Cost</th><th class="text-end">Allocated Exp</th><th class="text-end">Final Cost</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in landed_rows %}
+      <tr>
+        <td>{{ r.item }}</td>
+        <td class="text-end">{{ r.base }}</td>
+        <td class="text-end">{{ r.alloc }}</td>
+        <td class="text-end">{{ r.final }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+
+  {% if pdf_error %}
+    <div class="no-print" style="color:#b00020; font-size:12px; margin-top:8px;">
+      PDF generation is unavailable: {{ pdf_error }}. Use browser Print or install WeasyPrint deps.
+    </div>
+  {% endif %}
+
+  <div class="footer">
+    This is a blank printable template for {{ title }}.
+  </div>
+
+  {% if client.signatory_name or client.signatory_title %}
+  <div class="signatory">
+    <div>
+      <div class="signatory-line">Authorized Signatory</div>
+      {% if client.signatory_name %}<div>{{ client.signatory_name }}</div>{% endif %}
+      {% if client.signatory_title %}<div style="font-size:12px; color:#666;">{{ client.signatory_title }}</div>{% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if client.footer_note %}
+  <div class="notes">
+    <strong>Terms & Notes:</strong>
+    <div>{{ client.footer_note }}</div>
+  </div>
+  {% endif %}
+</body>
+</html>

@@ -1,0 +1,53 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+{% block style %}
+{% include 'admin/tablelink.html' %}
+{% endblock %}
+{% block content %}
+<div class="content-wrapper">
+    <div class="row">
+        <div class="col-12 grid-margin">
+            <div class="card">
+                <div class="card-body">
+                    <div class="col-md-12">
+                        <strong class="card-title heading-size fs-5">Quick Snapshot of Activity List</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 grid-margin">
+            <div class="card">
+                <div class="card-body">
+                    <table id="myTable" class="display responsive nowrap" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th>S.N</th>
+                                <th>Module</th>
+                                <th>Action</th>
+                                <th>Model</th>
+                                <th>Update At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in listAudit %}
+                            <tr>
+                                <td>{{forloop.counter}}</td>
+                                <td>{{item.module}}</td>
+                                <td>{{item.action}}</td>
+                                <td>{{item.model}}</td>
+                                <td>{{item.updated_at}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block script %}
+{% include 'admin/tablescript.html' %}
+{% endblock %}

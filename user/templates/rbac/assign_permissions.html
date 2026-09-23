@@ -1,0 +1,138 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+{% block style %}
+{% endblock %}
+{% block content %}
+<div class="content-wrapper">
+  <div class="row">
+    <div class="col-12 grid-margin">
+      <div class="card">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <strong class="card-title heading-size fs-5">Assign Permissions - {{ role.name|escape }}</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- =============== -->
+  <!-- Assign Persmission -->
+  <div class="row">
+    <div class="col-12 grid-margin">
+      <div class="card">
+        <div class="card-body">
+          <div class="container mt-3">
+            <form method="post" novalidate>
+              {% csrf_token %}
+              <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle text-center">
+                 <thead class="table-light">
+                    <tr>
+                        <th scope="col" class="text-start">Model</th>
+
+                        <th scope="col" class="text-center">
+                        <div>View</div>
+                        <div class="form-check form-switch d-flex justify-content-center mt-1">
+                            <input class="form-check-input master-toggle" type="checkbox" id="toggle_view" data-action="view" aria-label="Toggle all view permissions">
+                        </div>
+                        </th>
+
+                        <th scope="col" class="text-center">
+                        <div>Add</div>
+                        <div class="form-check form-switch d-flex justify-content-center mt-1">
+                            <input class="form-check-input master-toggle" type="checkbox" id="toggle_add" data-action="add" aria-label="Toggle all add permissions">
+                        </div>
+                        </th>
+
+                        <th scope="col" class="text-center">
+                        <div>Change</div>
+                        <div class="form-check form-switch d-flex justify-content-center mt-1">
+                            <input class="form-check-input master-toggle" type="checkbox" id="toggle_change" data-action="change" aria-label="Toggle all change permissions">
+                        </div>
+                        </th>
+
+                        <th scope="col" class="text-center">
+                        <div>Delete</div>
+                        <div class="form-check form-switch d-flex justify-content-center mt-1">
+                            <input class="form-check-input master-toggle" type="checkbox" id="toggle_delete" data-action="delete" aria-label="Toggle all delete permissions">
+                        </div>
+                        </th>
+                    </tr>
+                    </thead>
+                  <tbody>
+                    {% for model, actions in permissions.items %}
+                      <tr>
+                        <td class="text-start">{{ model|capfirst|escape }}</td>
+                        {% for action, perm in actions.items %}
+                          <td>
+                            {% if perm %}
+                              <div class="form-check form-switch d-flex justify-content-center">
+                                <input class="form-check-input permission-toggle" 
+                                  type="checkbox" 
+                                  name="permissions" 
+                                  value="{{ perm.id|escape }}" 
+                                  id="perm_{{ perm.id|escape }}" 
+                                  data-action="{{ action|escape }}"
+                                  aria-label="Toggle {{ action }} permission for {{ model|capfirst|escape }}"
+                                  {% if perm.id in assigned %}checked{% endif %}>
+                              </div>
+                            {% else %}
+                              &mdash;
+                            {% endif %}
+                          </td>
+                        {% endfor %}
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              <div class="mt-3 d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary">Save Permissions</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const masterToggles = document.querySelectorAll('.master-toggle');
+  const permissionToggles = document.querySelectorAll('.permission-toggle');
+
+  // Helper function to update master toggle checked status based on all checkboxes of that action
+  function updateMasterToggle(action) {
+    const allCheckboxes = document.querySelectorAll(`.permission-toggle[data-action="${action}"]`);
+    const masterToggle = document.querySelector(`.master-toggle[data-action="${action}"]`);
+    if (!masterToggle) return;
+
+    masterToggle.checked = Array.from(allCheckboxes).length > 0 && Array.from(allCheckboxes).every(cb => cb.checked);
+  }
+
+  // Initialize master toggles on page load
+  masterToggles.forEach(mt => updateMasterToggle(mt.dataset.action));
+
+  // Master toggle event: toggle all checkboxes in that column
+  masterToggles.forEach(masterToggle => {
+    masterToggle.addEventListener('change', () => {
+      const action = masterToggle.dataset.action;
+      const checkboxes = document.querySelectorAll(`.permission-toggle[data-action="${action}"]`);
+      checkboxes.forEach(cb => cb.checked = masterToggle.checked);
+    });
+  });
+
+  // Individual checkbox event: update master toggle state
+  permissionToggles.forEach(checkbox => {
+    checkbox.addEventListener('change', () => {
+      updateMasterToggle(checkbox.dataset.action);
+    });
+  });
+});
+</script>
+{% endblock %}

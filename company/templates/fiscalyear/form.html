@@ -1,0 +1,145 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+{% block style %}
+{% endblock %}
+{% block content %}
+<div class="content-wrapper">
+    <div class="row">
+        <div class="col-12 grid-margin">
+            <div class="card">
+                <div class="card-body">
+                    <div class="col-md-6">
+                        <strong class="card-title heading-size fs-5">Add Fiscal Year</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 grid-margin">
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST" id="fiscalyear-validation"
+                        action="{% if fiscal %} {% url 'fiscal.update' fiscal.id %} {% else %} {% url 'fiscal.store'%} {% endif %}">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-2">
+                                            <div class="row">
+                                                <div class="col-md-4 mt-2">
+                                                    <label for="english_full_name" style="font-size: var(--label-size);">F.Y Beginning From:<span class="text-danger">*</span></label>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <input type="text" class="form-control validation-form-input fYBeginningForm" id="fYBeginningForm" aria-describedby="F.Y Beginning Form"
+                                                    name="start_from" value="{% if fiscal %}{{fiscal.start_from}}{% endif %}" data-id="{{ fiscal.id }}" placeholder="" readonly>
+                                                    <small class="text-danger" id="validation-error-message"></small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-2">
+                                            <div class="row">
+                                                <div class="col-md-4 mt-2">
+                                                    <label class="text-wrap" style="font-size: var(--label-size);">End Date:<span style="color: red;">*</span></label>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <input type="text" class="form-control validation-form-input end-date" autocomplete="off"
+                                                        name="end_date" id="end_date" placeholder=""
+                                                        value="{% if fiscal %}{{fiscal.end_date}}{% endif %}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 text-end">
+                                <button type="submit" class="btn btn-primary">{% if fiscal %} Update {% else %} Submit
+                                    {% endif %}</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block script %}
+<script>
+    $(document).ready(function () {
+        $('#fiscalyear-validation').on('submit', function (e) {
+            let startFrom = $('#fYBeginningForm').val().trim();
+            let endDate = $('#end_date').val().trim();
+
+            if (startFrom === '' || endDate === '') {
+                e.preventDefault();
+                if (startFrom === '') {
+                    toastr.error('Please select "F.Y Beginning From".', 'Validation Error');
+                }
+                if (endDate === '') {
+                    toastr.error('Please select "End Date".', 'Validation Error');
+                }
+                return false;
+            }
+        });
+    });
+</script>
+<script>
+    window.onload = function () {
+        let fyError = false;
+
+        const checkAccount = (field, url, errorElement, dataKey, id) => {
+            const val = $(field).val().trim();
+            if (val.length < 3) return $(errorElement).hide(), fyError = false, toggleSubmit();
+
+            $.get(url, { [dataKey]: val, id: id }, response => {
+                fyError = response.exists;
+                $(errorElement).text(fyError ? 'Create a unique Start Date for Fiscal Year Setup.' : '').toggle(fyError);
+                toggleSubmit();
+            }).fail(() => $(errorElement).text('An error occurred while validating the form.').show());
+        };
+
+        const toggleSubmit = () => $('.btn-primary').attr('disabled', fyError);
+
+        const validateDate = () => {
+            const [year, month, day] = $('.fYBeginningForm').val().split('-').map(Number);
+            if (month !== 4 || day !== 1) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Invalid Error',
+                    text: 'Please Select the Valid Date, which is always 04-01 of the year.',
+                    confirmButtonText: 'Try Again!',
+                    confirmButtonColor: '#d33',
+                });
+                $('.fYBeginningForm').val('');
+            }
+        };
+
+        const input = document.querySelector('.fYBeginningForm');
+        const endDateInput = document.querySelector('.end-date');
+        const id = input ? input.dataset.id : null;
+        const errorElement = input ? input.nextElementSibling : null;
+
+        if (input) {
+            input.addEventListener('input', () => checkAccount(input, "{% url 'realtime_validation_fisicalyear' %}", errorElement, input.name, id));
+            input.addEventListener('change', () => checkAccount(input, "{% url 'realtime_validation_fisicalyear' %}", errorElement, input.name, id));
+
+            input.NepaliDatePicker({
+                miniEnglishDates: true,
+                onSelect: () => {
+                    checkAccount(input, "{% url 'realtime_validation_fisicalyear' %}", errorElement, input.name, id);
+                    validateDate(input);
+                }
+            });
+        }
+        if (endDateInput){
+            endDateInput.NepaliDatePicker({
+                miniEnglishDates: true
+            });
+        }
+    };
+</script>
+{% endblock %}

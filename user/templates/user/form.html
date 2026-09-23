@@ -1,0 +1,252 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+{% block style %}
+{% endblock %}
+{% block content %}
+<div class="content-wrapper">
+    <div class="row">
+        <div class="col-12 grid-margin">
+            <div class="card">
+                <div class="card-body">
+                    <div class="col-md-6">
+                        <strong class="card-title heading-size fs-5">Create User</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 grid-margin">
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST" id="user-form" action="{% url 'user:user.store.post' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" id="user_id" name="user_id" value="{{ userDetails.id|default:'' }}">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <div class="row">
+                                        <div class="col-md-4 mt-2">
+                                            <label for="english_full_name" style="font-size: var(--label-size);">Full Name Eng.:<span class="text-danger">*</span></label>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <input type="text" class="form-control" id="english_full_name" name="engilsh_fullname" 
+                                                   value="{{ userDetails.engilsh_fullname|default:'' }}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <div class="row">
+                                        <div class="col-md-4 mt-2">
+                                            <label for="companyAddress" style="font-size: var(--label-size);">Address:</label>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <input type="text" class="form-control" id="companyAddress" name="address" 
+                                                   value="{{ userDetails.address|default:'' }}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <div class="row">
+                                        <div class="col-md-4 mt-2">
+                                            <label for="email" style="font-size: var(--label-size);">Email Address:<span class="text-danger">*</span></label>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <input type="email" class="form-control" id="email" name="email" 
+                                                   value="{{ userDetails.email|default:'' }}" data-original="{{ userDetails.email|default:'' }}">
+                                                <small id="email-exists-error" class="text-danger text-capitalize"></small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <div class="row">
+                                        <div class="col-md-4 mt-2">
+                                            <label for="username" style="font-size: var(--label-size);">User Name:<span class="text-danger">*</span></label>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <input type="text" class="form-control" id="username" name="username" 
+                                                   value="{{ userDetails.username|default:'' }}" data-original="{{ userDetails.username|default:'' }}">
+                                                <small id="username-exists-error" class="text-danger text-capitalize"></small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <div class="row">
+                                        <div class="col-md-4 mt-2">
+                                            <label for="password" style="font-size: var(--label-size);">Password:<span class="text-danger">*</span></label>
+                                        </div>
+                                        <div class="col-md-8 position-relative">
+                                            <input type="password" class="form-control" id="password" name="password">
+                                            <i class="fas fa-eye fs-5 toggle-password" style="position: absolute; right: 30px; top: 50%; transform: translateY(-50%); cursor: pointer;"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <div class="row">
+                                        <div class="col-md-4 mt-2">
+                                            <label for="c_password" style="font-size: var(--label-size);">Confirm Pw:<span class="text-danger">*</span></label>
+                                        </div>
+                                        <div class="col-md-8 position-relative">
+                                            <input type="password" class="form-control" id="password_confirmation" name="password_confirmation">
+                                            <i class="fas fa-eye fs-5 toggle-password" style="position: absolute; right: 30px; top: 50%; transform: translateY(-50%); cursor: pointer;"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                   
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <div class="row">
+                                        <div class="col-md-4 mt-2">
+                                            <label for="telNo" style="font-size: var(--label-size);">Phone:</label>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <input type="text" class="form-control" id="telNo" name="tel_no" 
+                                                   value="{{ company.tel_no|default:'' }}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <div class="row">
+                                        <div class="col-md-4 mt-2">
+                                            <label for="id_role"  style="font-size: var(--label-size);" >Role:</label>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <select name="role" class="form-control form-select" id="id_role" required>
+                                                 {% for role in roles %}
+                                                        <option value="{{ role.id }}" {% if values.role == role.id|stringformat:"s" %}selected{% endif %}>{{ role.name }}</option>
+                                                    {% endfor %}
+                                            </select>
+                                            {% if form.role.errors %}
+                                            <div class="error">{{ form.role.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <div class="row">
+                                        <div class="col-md-4 mt-2">
+                                            <label for="uploadimage" style="font-size: var(--label-size);">Image:</label>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <input class="form-control" type="file" name="profile_images" accept="image/*">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-12 text-end">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block script %}
+<script src="{% static 'assets/js/realtimevalidation.js' %}"></script>
+<script>
+    $(document).ready(function () {
+        GlobalFormValidation.initFormValidation('#user-form', [
+            {
+                fieldSelector: '#email',
+                url: "{% url 'user:ajax_user_validation_email' %}",
+                errorSelector: '#email-exists-error',
+                key: 'email',
+                originalValue: $('#email').data('original'),
+                method: 'GET',
+                extraData: { id: $('#user_id').val() },
+            },
+            { 
+                fieldSelector: '#username',
+                url: "{% url 'user:ajax_loaddata_username' %}",
+                errorSelector: '#username-exists-error',
+                key: 'username',
+                originalValue: $('#username').data('original'),
+                method: 'GET',
+                extraData: { id: $('#user_id').val() },
+            }
+        ]);
+        $('#user-form').submit(function (event) {
+            event.preventDefault();
+
+            const fields = [
+                { id: '#english_full_name', requiredMessage: 'Full Name is required.'},
+                { id: '#email', regex: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, requiredMessage: 'Email is required.', regexMessage: 'Enter a valid email address.' },
+                { id: '#username', regex: /^[a-zA-Z0-9_]+$/, requiredMessage: 'Username is required.', regexMessage: 'Username should only contain letters, numbers, and underscores.' },
+                { id: '#password', regex: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/, requiredMessage: 'Password is required.', regexMessage: 'Password must be at least 6 characters, including 1 uppercase letter, 1 lowercase letter, and 1 number.' },
+                { id: '#password_confirmation', requiredMessage: 'Confirm Password is required.', regexMessage: 'Passwords do not match.' },
+                { id: '#telNo', regex: /^[0-9]{7,10}$/, requiredMessage: 'Phone number is required.', regexMessage: 'Phone number should be between 7 to 10 digits.' }
+            ];
+
+            let passwordValue = $('#password').val().trim();
+            let confirmPasswordValue = $('#password_confirmation').val().trim();
+
+            for (let field of fields) {
+                let value = $(field.id).val().trim();
+                if (!value) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: field.requiredMessage,
+                        icon: 'error',
+                        confirmButtonText: 'Try again'
+                    });
+                    $(field.id).focus();
+                    return;
+                } 
+                if (field.regex && !field.regex.test(value)) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: field.regexMessage,
+                        icon: 'error',
+                        confirmButtonText: 'Try again'
+                    });
+                    $(field.id).focus();
+                    return;
+                }
+            }
+
+            if (passwordValue !== confirmPasswordValue) {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Passwords do not match.',
+                    icon: 'error',
+                    confirmButtonText: 'Try again'
+                });
+                $('#password_confirmation').focus();
+                return;
+            }
+
+            this.submit();
+        });
+
+        $('.toggle-password').click(function () {
+            let input = $(this).siblings('input');
+            input.attr('type', input.attr('type') === 'password' ? 'text' : 'password');
+            $(this).toggleClass('fa-eye-slash');
+        });
+    });
+</script>
+{% endblock %}

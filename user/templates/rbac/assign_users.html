@@ -1,0 +1,45 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="content-wrapper">
+    <div class="row">
+        <div class="col-6 grid-margin mx-auto">
+            <div class="card border p-3">
+                <div class="card-body">
+                    <div class="container mt-3">
+                        <h2 class="mb-4 text-center">Assign Users to {{ role.name }}</h2>
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-md-12 mb-2">
+                                    <label for="selectuser" class="mb-2" style="font-size: var(--label-size);">Select Users</label>
+                                    <select name="users" id="users" class="form-select" multiple="multiple">
+                                        {% for user in users %}
+                                            <option value="{{ user.id }}" {% if user.id in assigned_ids %}selected{% endif %}>
+                                                {{ user.get_full_name|default:user.username }} ({{ user.email }})
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 mt-3">Assign</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block script %}
+<script>
+  $(document).ready(function() {
+    $('#users').select2({
+      placeholder: 'Select users',
+      allowClear: true,
+      width: 'resolve'
+    });
+  });
+</script>
+{% endblock %}

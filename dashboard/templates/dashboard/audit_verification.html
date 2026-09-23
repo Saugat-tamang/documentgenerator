@@ -1,0 +1,143 @@
+{% extends 'admin/base1.html' %}
+{% load static %}
+{% block content %}
+<div class="content-wrapper">
+  <div class="row">
+      <div class="col-12 grid-margin">
+          <div class="card">
+              <div class="card-body">
+                  <div class="col-md-12 mt-2 mb-3">
+                      <strong class="card-title heading-size fs-5">Manual Verification — Sales, Purchases, Expenses
+                      </strong>
+                  </div>
+                  <div class="col-md-12">
+                    <div class="row">
+                      <div class="col-md-4">
+                        <select id="verifyType" class="form-select">
+                          <option value="sales">Sales</option>
+                          <option value="purchase">Purchases</option>
+                          <option value="expenses">Expenses</option>
+                        </select>
+                      </div>
+                      <div class="col-md-3">
+                        <select id="verifyStatus" class="form-select">
+                          <option value="verified">Verified</option>
+                          <option value="flagged">Flagged</option>
+                          <option value="rework">Rework</option>
+                          <option value="pending">Pending</option>
+                        </select>
+                      </div>
+                      <div class="col-md-3">
+                        <input id="verifyRemarks" class="form-control" placeholder="Remarks (optional)"/>
+                      </div>
+                      <div class="col-md-2">
+                        <button id="markSelected" class="btn btn-primary">Mark Selected</button>
+                      </div>
+                    </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  <div class="row">
+    <div class="col-12 grid-margin">
+      <div class="card">
+        <div class="card-body">
+          <div class="row g-3 align-items-center mb-3">
+            <div class="col-md-4">
+              <div id="verifyPie" style="height:260px;"></div>
+            </div>
+            <div class="col-md-8 d-flex align-items-center">
+              <div id="verifySummaryText" class="text-muted"></div>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th><input type="checkbox" id="selectAll"/></th>
+                  <th>ID</th>
+                  <th>Bill Date</th>
+                  <th>Bill No</th>
+                  <th>PAN</th>
+                  <th>Type/Month</th>
+                  <th>Taxable</th>
+                  <th>Tax</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyRows"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="{% static 'assets/js/plotdiagram.js' %}"></script>
+<script>
+async function loadData(){
+  const typ = document.getElementById('verifyType').value;
+  const res = await fetch('{% url "audit.verification.data" %}?type='+encodeURIComponent(typ));
+  const d = await res.json();
+  const list = d[typ==='purchase'?'purchases':typ] || [];
+  const tbody = document.getElementById('tbodyRows');
+  tbody.innerHTML = list.map(r => {
+    const status = (r.verification_status||'pending').toLowerCase();
+    const rowClass = status === 'verified' ? 'table-success' : '';
+    const statusBadge = status === 'verified' ? `<span class="badge bg-success rounded">${status}</span>` : status;
+    return `
+      <tr class="${rowClass}">
+        <td><input type="checkbox" class="sel" value="${r.id}"></td>
+        <td>${r.id}</td>
+        <td>${r.bill_date||''}</td>
+        <td>${r.bill_no||''}</td>
+        <td>${r.pan||''}</td>
+        <td>${(r.purchase_type||'') || (r['month_name__month_name_en']||'')}</td>
+        <td>${r.taxable_amount||''}</td>
+        <td>${r.tax_amount||''}</td>
+        <td>${r.total_amount||''}</td>
+        <td>${statusBadge}</td>
+      </tr>`;
+  }).join('');
+
+  // Update pie chart summary
+  const verifiedCount = list.filter(r => (r.verification_status||'').toLowerCase()==='verified').length;
+  const unverifiedCount = list.length - verifiedCount;
+  const pct = list.length ? Math.round((verifiedCount / list.length) * 100) : 0;
+  const labels = ['Verified', 'Unverified'];
+  const values = [verifiedCount, unverifiedCount];
+  const colors = ['#28a745', '#6c757d'];
+  try {
+    Plotly.newPlot('verifyPie', [{type:'pie', labels: labels, values: values, marker:{colors: colors}}], {margin:{t:10,b:10,l:10,r:10}, legend:{orientation:'h'}}, {responsive:true , displayModeBar:false});
+  } catch(e) { console.warn('Plotly render failed', e); }
+  const typMap = {sales:'Sales', purchase:'Purchases', expenses:'Expenses'};
+  const typeLabel = typMap[typ] || typ;
+  document.getElementById('verifySummaryText').textContent = `${verifiedCount}/${list.length} ${typeLabel} verified (${pct}%)`;
+}
+async function markSelected(){
+  const typ = document.getElementById('verifyType').value;
+  const status = document.getElementById('verifyStatus').value;
+  const remarks = document.getElementById('verifyRemarks').value;
+  const ids = Array.from(document.querySelectorAll('input.sel:checked')).map(i=>i.value);
+  if(ids.length===0){ alert('Select at least one row.'); return; }
+  const form = new FormData();
+  form.append('type', typ);
+  form.append('status', status);
+  form.append('remarks', remarks);
+  ids.forEach(id=>form.append('ids[]', id));
+  const res = await fetch('{% url "audit.verification.mark" %}', { method:'POST', body: form, headers: { 'X-Requested-With':'XMLHttpRequest' } });
+  const d = await res.json();
+  if(res.ok){ loadData(); } else { console.error(d); alert('Failed: '+(d.error||'Unknown')); }
+}
+document.addEventListener('DOMContentLoaded', ()=>{
+  loadData();
+  document.getElementById('verifyType').addEventListener('change', loadData);
+  document.getElementById('markSelected').addEventListener('click', markSelected);
+  document.getElementById('selectAll').addEventListener('change', (e)=>{
+    document.querySelectorAll('input.sel').forEach(cb=>{ cb.checked = e.target.checked; });
+  });
+});
+</script>
+{% endblock %}

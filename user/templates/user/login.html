@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FynTax Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        nav {
+            height: 72px;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        nav.scrolled {
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-svg {
+            width: 160px;
+            height: 40px;
+        }
+
+        .container-fluid {
+            min-height: 100vh;
+        }
+
+        .left-section {
+            background-color: #ffffff;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .logo {
+            width: 180px;
+            max-width: 100%;
+            margin-bottom: 1.5rem;
+        }
+
+        .welcome-text {
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: #1e3a8a;
+            margin-bottom: 1rem;
+        }
+
+        .sub-text {
+            font-size: 1rem;
+            color: #475569;
+            max-width: 450px;
+            line-height: 1.6;
+        }
+
+        .illustration {
+            width: 100%;
+            max-width: 400px;
+            margin-top: 2rem;
+        }
+
+        .illustration svg {
+            width: 100%;
+            height: auto;
+        }
+
+        .right-section {
+            background: transparent;
+            padding: 3rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-form {
+            max-width: 450px;
+            width: 100%;
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: #1e3a8a;
+            margin-bottom: 0.5rem;
+        }
+
+        .input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-group-text {
+            background-color: #f8fafc;
+            border: 1px solid #e5e7eb;
+            color: #475569;
+            padding: 0.75rem;
+            border-radius: 8px 0 0 8px;
+            border-right: none;
+        }
+
+        .form-control {
+            border: 1px solid #e5e7eb;
+            border-radius: 0 8px 8px 0;
+            padding: 0.75rem;
+            width: 100%;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #1e40af;
+            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+            outline: none;
+        }
+
+        .btn-primary {
+            background: #1e40af;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem;
+            font-weight: 500;
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background: #1e40af;
+        }
+
+        .social-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            border: 1px solid #e5e7eb;
+            transition: background 0.3s ease, color 0.3s ease, transform 0.2s ease;
+        }
+
+        .social-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .social-btn.google {
+            color: #4285f4;
+        }
+
+        .social-btn.google:hover {
+            background-color: #4285f4;
+            color: #ffffff;
+        }
+
+        .social-btn.facebook {
+            color: #3b5998;
+        }
+
+        .social-btn.facebook:hover {
+            background-color: #3b5998;
+            color: #ffffff;
+        }
+
+        .social-btn.twitter {
+            color: #1da1f2;
+        }
+
+        .social-btn.twitter:hover {
+            background-color: #1da1f2;
+            color: #ffffff;
+        }
+
+        @media (max-width: 767.98px) {
+
+            .left-section,
+            .right-section {
+                padding: 2rem;
+            }
+
+            .welcome-text {
+                font-size: 2rem;
+            }
+
+            .login-form {
+                padding: 1.5rem;
+            }
+
+            .logo {
+                width: 140px;
+            }
+
+            .illustration {
+                max-width: 300px;
+            }
+        }
+
+        nav a:hover {
+            transform: translateY(-1px);
+        }
+
+        #forgotPasswordModal,
+        #resetPasswordModal {
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+        }
+
+        .container {
+            background: #f3f3f3;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            max-width: 360px;
+            width: 90%;
+            padding: 2rem;
+            position: relative;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+            color: #171623;
+        }
+
+        .validation-list {
+            list-style: none;
+            text-align: left;
+            padding-left: 1.2rem;
+            margin-top: 0.8rem;
+            font-weight: 600;
+            color: #ff3b3b;
+        }
+
+        .validation-list li.valid {
+            color: #28a745;
+        }
+    </style>
+
+</head>
+
+<body class="bg-gray-50 text-gray-900 smooth-scroll">
+    <nav class="bg-white fixed w-full z-20 top-0 transition-shadow duration-300" aria-label="Main navigation" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="/" aria-label="FynTax Home">
+                        <span
+                            class="text-lg sm:text-md md:text-xl lg:text-2xl font-extrabold text-indigo-600">FynTax</span>
+                    </a>
+                </div>
+                <div class="hidden sm:flex items-center space-x-8">
+                    <a href="/"
+                        class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-md font-medium transition duration-200">Home</a>
+                    <a href="#services"
+                        class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-md font-medium transition duration-200">Services</a>
+                    <a href="#about"
+                        class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-md font-medium transition duration-200">About</a>
+                    <a href="#contact"
+                        class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-md font-medium transition duration-200">Contact</a>
+                    <a href="{% url 'user:login' %}"
+                        class="bg-indigo-600 text-white px-4 py-2 rounded-md text-md font-medium hover:bg-indigo-700 transition duration-200">Get
+                        Started</a>
+                </div>
+                <div class="sm:hidden flex items-center">
+                    <button id="menu-toggle" class="text-gray-700 hover:text-indigo-600 focus:outline-none"
+                        aria-expanded="false" aria-controls="mobile-menu" aria-label="Toggle menu">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16m-7 6h7" class="menu-icon" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" class="close-icon hidden" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="mobile-menu" class="hidden sm:hidden bg-white shadow-md">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="/"
+                    class="block text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-base font-medium transition duration-200">Home</a>
+                <a href="#services"
+                    class="block text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-base font-medium transition duration-200">Services</a>
+                <a href="#about"
+                    class="block text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-base font-medium transition duration-200">About</a>
+                <a href="#contact"
+                    class="block text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-base font-medium transition duration-200">Contact</a>
+                <a href="{% url 'user:login' %}"
+                    class="block bg-indigo-600 text-white px-3 py-2 rounded-md text-base font-medium hover:bg-indigo-700 transition duration-200 text-center">Get
+                    Started</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-20 mb-2">
+        <div class="flex flex-col md:flex-row min-h-screen">
+            <div class="left-section md:w-1/2 flex flex-col justify-center items-center">
+                <div class="text-center">
+                    <h1 class="welcome-text">Welcome Back :)</h1>
+                    <p class="sub-text">To stay connected with FynTax, please login with your email address and
+                        password.</p>
+                    <div class="illustration">
+                        <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" aria-label="FynTax Illustration">
+                            <defs>
+                                <linearGradient id="codeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#22d3ee" />
+                                    <stop offset="100%" style="stop-color:#1e40af" />
+                                </linearGradient>
+                            </defs>
+                            <circle cx="150" cy="150" r="120" fill="#dbeafe" opacity="0.3" />
+                            <g transform="translate(50, 50)">
+                                <circle cx="100" cy="100" r="20" fill="url(#codeGradient)" />
+                                <circle cx="50" cy="50" r="15" fill="#22d3ee" opacity="0.7" />
+                                <circle cx="150" cy="50" r="15" fill="#22d3ee" opacity="0.7" />
+                                <circle cx="50" cy="150" r="15" fill="#22d3ee" opacity="0.7" />
+                                <circle cx="150" cy="150" r="15" fill="#22d3ee" opacity="0.7" />
+                                <path d="M100 100 L50 50" stroke="#1e40af" stroke-width="3" opacity="0.5" />
+                                <path d="M100 100 L150 50" stroke="#1e40af" stroke-width="3" opacity="0.5" />
+                                <path d="M100 100 L50 150" stroke="#1e40af" stroke-width="3" opacity="0.5" />
+                                <path d="M100 100 L150 150" stroke="#1e40af" stroke-width="3" opacity="0.5" />
+                            </g>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="right-section md:w-1/2 flex justify-center items-center">
+                <div class="login-form">
+
+                    {% if error_message %}
+                    <div class="alert alert-danger mb-4">{{ error_message }}</div>
+                    {% endif %}
+
+                    <!-- Login Form -->
+                    <form id="login-form" method="POST" action="{% url 'user:authenticate' %}">
+                        {% csrf_token %}
+
+                        <!-- Email Field -->
+                        <div class="mb-4">
+                            <label for="email" class="form-label">Email Address</label>
+                            <div class="input-group mt-4">
+                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                <input type="email" class="form-control" name="email" id="email"
+                                    value="{{ email_value|default:'' }}" placeholder="Email"
+                                    aria-label="Email Address" required>
+                            </div>
+                        </div>
+
+                        <!-- Password Field -->
+                        <div class="mb-4">
+                            <label for="password" class="form-label">Password</label>
+                            <div class="input-group mt-4 position-relative">
+                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                <input type="password" class="form-control" id="password"
+                                    placeholder="Password" name="password" aria-label="Password" required>
+                                <span class="absolute right-0 pr-3 cursor-pointer text-gray-500">
+                                    <i class="fas fa-eye" id="togglePassword"></i>
+                                </span>
+                            </div>
+                            <!-- Forgot Password Link -->
+                            <p class="text-right mt-2">
+                                <a href="#" id="forgotPasswordLink"
+                                    class="text-indigo-600 hover:underline text-sm">Forgot Password?</a>
+                            </p>
+                        </div>
+
+                        <!-- Remember Me -->
+                        <div class="flex items-center mb-4">
+                            <input type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                                id="rememberMe">
+                            <label class="ml-2 text-sm text-gray-600" for="rememberMe">Remember Me</label>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="mt-4">
+                            <button id="loginBtn" class="flex items-center justify-center bg-white border border-gray-300 px-4 py-2 rounded-md w-full">
+                                <span id="btnText">Login Now</span>
+                                <div id="btnLoader" class="loader ml-2 w-4 h-4 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin hidden"></div>
+                            </button>
+                        </div>
+
+                        <p class="text-center text-sm text-gray-600 mt-6">Visit Our Social Media</p>
+                        <div class="flex justify-center gap-3 mt-6">
+                            <button class="social-btn google" aria-label="Sign in with Google"><i
+                                    class="fab fa-google"></i></button>
+                            <button class="social-btn facebook" aria-label="Sign in with Facebook"><i
+                                    class="fab fa-facebook-f"></i></button>
+                            <button class="social-btn twitter" aria-label="Sign in with Twitter"><i
+                                    class="fab fa-twitter"></i></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Forgot Password / OTP / Reset Modal -->
+            <div id="passwordModal" class="fixed inset-0 hidden bg-black bg-opacity-50 justify-center items-center z-50">
+                <div class="bg-[#f3f3f3] rounded-2xl shadow-lg max-w-sm w-full p-6 relative">
+
+                    <!-- Modal Title -->
+                    <h2 id="modalTitle" class="text-center text-2xl font-bold mb-6">Forgot Password</h2>
+
+                    <!-- Step 1: Email Form -->
+                    <form id="forgotEmailForm" novalidate>
+                        {% csrf_token %}
+                        <label class="block mb-2">Email</label>
+                        <input type="email" name="email" placeholder="Enter your email" class="w-full border rounded px-3 py-2 form-control" required/>
+                        <button type="submit" class="mt-4 w-full bg-indigo-700 text-white py-2 rounded-lg">Send OTP</button>
+                        <p id="emailError" class="text-red-600 mt-2"></p>
+                    </form>
+
+                    <!-- Step 2: OTP Form -->
+                    <form id="otpForm" class="hidden mt-4" novalidate>
+                        {% csrf_token %}
+                        <label class="block mb-2">Enter OTP sent to <span id="otpEmail"></span></label>
+                        <input type="text" name="otp" required class="w-full border rounded px-3 py-2 form-control" />
+                        <input type="hidden" name="email" id="otpEmailInput" />
+                        
+                        <div class="timer font-semibold text-[#171623] mt-2 mb-2 text-left" id="otpTimer">Time left: 01:00</div>
+
+                        <button type="submit" class="mt-4 w-full bg-indigo-700 text-white py-2 rounded-lg">
+                            Verify OTP
+                        </button>
+
+                        <button type="button" id="resendOtpBtn" 
+                            class="mt-2 w-full bg-gray-600 text-white py-2 rounded-lg hidden">
+                            Resend OTP
+                        </button>
+
+                        <p id="otpError" class="text-red-600 mt-2"></p>
+                        <p id="otpSuccess" class="text-green-600 mt-2"></p>
+                    </form>
+
+
+                    <!-- Step 3: Reset Password Form -->
+                    <form id="resetForm" class="hidden mt-4" novalidate>
+                        {% csrf_token %}
+                        <label class="block mb-2">New Password:</label>
+                        <input type="password" name="new_password" id="new_password"
+                            class="w-full border rounded px-3 py-2" required />
+
+                        <label class="block mb-2 mt-3">Confirm Password:</label>
+                        <input type="password" name="confirm_password" id="confirm_password"
+                            class="w-full border rounded px-3 py-2" required />
+
+                        <ul class="validation-list mt-2 text-sm">
+                            <li id="uppercase">At least 1 uppercase letter</li>
+                            <li id="number">At least 1 number</li>
+                            <li id="match">Passwords must match</li>
+                        </ul>
+
+                        <button type="submit" id="resetSubmitBtn" disabled
+                            class="mt-4 w-full bg-indigo-700 text-white py-2 rounded-lg">
+                            Reset Password
+                        </button>
+                        <p id="resetError" class="text-red-600 mt-2"></p>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-gradient-to-b from-gray-900 to-gray-800 text-white pt-16 pb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                <div class="text-center md:text-left">
+                    <div class="flex items-center justify-center md:justify-start mb-4">
+                        <h3
+                            class="text-3xl font-extrabold text-white tracking-wide bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-600">
+                            FynTax</h3>
+                        <span class="ml-2 text-blue-400 animate-pulse">✦</span>
+                    </div>
+                    <p class="text-gray-300 mb-6 leading-relaxed max-w-md mx-auto md:mx-0">
+                        Simplifying your financial journey with smart, innovative tax solutions.
+                    </p>
+                    <div class="flex space-x-4 justify-center md:justify-start">
+                        <a href="#"
+                            class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center hover:bg-blue-600 transition-all duration-300 hover:-translate-y-1">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#"
+                            class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center hover:bg-blue-400 transition-all duration-300 hover:-translate-y-1">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#"
+                            class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center hover:bg-pink-500 transition-all duration-300 hover:-translate-y-1">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="text-center md:text-left">
+                    <h4 class="text-xl font-semibold mb-6 uppercase tracking-wider text-blue-400 relative inline-block">
+                        Quick Links
+                        <span
+                            class="absolute bottom-0 left-0 w-full h-0.5 bg-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-out"></span>
+                    </h4>
+                    <ul class="space-y-3">
+                        <li>
+                            <a href="#"
+                                class="text-gray-300 hover:text-white transition-all duration-500 ease-in-out block relative overflow-hidden group">
+                                <span
+                                    class="relative inline-block transform group-hover:translate-x-2 transition-all duration-500 ease-in-out">
+                                    Home
+                                    <span
+                                        class="absolute left-0 bottom-0 w-0 h-px bg-blue-400 group-hover:w-full transition-all duration-700 ease-out"></span>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#"
+                                class="text-gray-300 hover:text-white transition-all duration-500 ease-in-out block relative overflow-hidden group">
+                                <span
+                                    class="relative inline-block transform group-hover:translate-x-2 transition-all duration-500 ease-in-out">
+                                    About Us
+                                    <span
+                                        class="absolute left-0 bottom-0 w-0 h-px bg-blue-400 group-hover:w-full transition-all duration-700 ease-out"></span>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#"
+                                class="text-gray-300 hover:text-white transition-all duration-500 ease-in-out block relative overflow-hidden group">
+                                <span
+                                    class="relative inline-block transform group-hover:translate-x-2 transition-all duration-500 ease-in-out">
+                                    Services
+                                    <span
+                                        class="absolute left-0 bottom-0 w-0 h-px bg-blue-400 group-hover:w-full transition-all duration-700 ease-out"></span>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#"
+                                class="text-gray-300 hover:text-white transition-all duration-500 ease-in-out block relative overflow-hidden group">
+                                <span
+                                    class="relative inline-block transform group-hover:translate-x-2 transition-all duration-500 ease-in-out">
+                                    Contact
+                                    <span
+                                        class="absolute left-0 bottom-0 w-0 h-px bg-blue-400 group-hover:w-full transition-all duration-700 ease-out"></span>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="text-center md:text-left">
+                    <h4 class="text-xl font-semibold mb-6 uppercase tracking-wider text-blue-400">Newsletter</h4>
+                    <p class="text-gray-300 mb-4">Subscribe to get updates on tax tips and financial insights.</p>
+
+                    <form class="flex flex-col space-y-4 max-w-md mx-auto md:mx-0">
+                        <input type="email" placeholder="Your email address"
+                            class="px-4 py-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400">
+                        <button
+                            class="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition duration-300 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                            Subscribe Now
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-700 mt-12 pt-8 text-center">
+                <p class="text-gray-400 text-sm">
+                    &copy; 2025 FynTax. All rights reserved. | <a href="#" class="hover:text-blue-400">Privacy
+                        Policy</a> | <a href="#" class="hover:text-blue-400">Terms of Service</a>
+                </p>
+                <p class="text-gray-500 text-xs mt-2">Made with ❤️ for smart taxpayers</p>
+            </div>
+        </div>
+    </footer>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script>
+        // Mobile menu toggle
+        const menuToggle = document.getElementById('menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        menuToggle.addEventListener('click', () => {
+            const isExpanded = menuToggle.getAttribute('aria-expanded') === 'true';
+            menuToggle.setAttribute('aria-expanded', !isExpanded);
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Smooth scroll for nav links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                    mobileMenu.classList.add('hidden');
+                    menuToggle.setAttribute('aria-expanded', 'false');
+                }
+            });
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+
+        // Form submission
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        $(document).ready(function () {
+            toastr.options = {
+                closeButton: true,
+                progressBar: true,
+                positionClass: 'toast-top-right',
+                timeOut: 5000
+            };
+            $('#login-form').on('submit', function (e) {
+                e.preventDefault();
+
+                $('#btnLoader').removeClass('hidden');
+                $('#btnText').text('Logging in...');
+                $('#loginBtn').prop('disabled', true);
+
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            window.location.href = response.redirect_url;
+                        } else if (response.otp_required) {
+                            window.location.href = `/user/auth/verify-otp-page/?email=${response.email}&device_id=${response.device_id}`;
+                        } else {
+                            $('#btnLoader').addClass('hidden');
+                            $('#btnText').text('Login Now');
+                            $('#loginBtn').prop('disabled', false);
+                            toastr.error(response.error_message, 'Login Failed');
+                        }
+                    },
+                    error: function (xhr) {
+                        $('#btnLoader').addClass('hidden');
+                        $('#btnText').text('Login Now');
+                        $('#loginBtn').prop('disabled', false);
+                        var res = xhr.responseJSON;
+                        if (res && res.error_message) {
+                            toastr.error(res.error_message, 'Login Failed');
+                        } else {
+                            toastr.error('An unexpected error occurred.', 'Error');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("login-form");
+            if (!form) return;
+
+            // Get existing device_id from localStorage or generate a new one
+            let deviceId = localStorage.getItem("device_id");
+            if (!deviceId) {
+                if (crypto.randomUUID) {
+                    deviceId = crypto.randomUUID();
+                } else {
+                    // Fallback for older browsers
+                    deviceId = "dev-" + Math.random().toString(36).substring(2, 15);
+                }
+                localStorage.setItem("device_id", deviceId);
+            }
+
+            // Check if hidden input already exists; if not, create it
+            let hiddenInput = form.querySelector("input[name='device_id']");
+            if (!hiddenInput) {
+                hiddenInput = document.createElement("input");
+                hiddenInput.type = "hidden";
+                hiddenInput.name = "device_id";
+                form.appendChild(hiddenInput);
+            }
+
+            // Always update value before submitting
+            hiddenInput.value = deviceId;
+
+            // Optional: ensure value is updated on submit
+            form.addEventListener("submit", function () {
+                hiddenInput.value = deviceId;
+            });
+        });
+    </script>
+    <script>
+    $(document).ready(function () {
+
+        // ---------------- Open Modal ----------------
+        $('#forgotPasswordLink').click(function (e) {
+            e.preventDefault();
+            $('#passwordModal').removeClass('hidden').addClass('flex');
+            showStep('email');
+        });
+
+        // ---------------- Close Modal on Outside Click ----------------
+        $(window).click(function (e) {
+            if (e.target.id === 'passwordModal') {
+                $('#passwordModal').removeClass('flex').addClass('hidden');
+            }
+        });
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // ---------------- Show Step ----------------
+        function showStep(step) {
+            $('#forgotEmailForm, #otpForm, #resetForm').addClass('hidden');
+            if (step === 'email') { $('#forgotEmailForm').removeClass('hidden'); $('#modalTitle').text('Forgot Password'); }
+            if (step === 'otp') { $('#otpForm').removeClass('hidden'); $('#modalTitle').text('Verify OTP'); }
+            if (step === 'reset') { $('#resetForm').removeClass('hidden'); $('#modalTitle').text('Reset Password'); }
+        }
+
+        // ---------------- OTP Timer ----------------
+        let countdown;
+        function startOtpTimer() {
+            clearInterval(countdown);
+            let otpTime = 60; // 1 min
+            $('#resendOtpBtn').addClass('hidden');
+            $('#otpForm input, #otpForm button').prop('disabled', false);
+
+            countdown = setInterval(() => {
+                let min = Math.floor(otpTime / 60);
+                let sec = otpTime % 60;
+                if (sec < 10) sec = '0' + sec;
+                $('#otpTimer').text(`Time left: ${min}:${sec}`);
+                if (otpTime <= 0) {
+                    clearInterval(countdown);
+                    $('#otpTimer').text('OTP expired.');
+                    $('#otpForm input, #otpForm button[type="submit"]').prop('disabled', true);
+                    $('#resendOtpBtn').removeClass('hidden');
+                }
+                otpTime--;
+            }, 1000);
+        }
+
+        // ---------------- Step 1: Send Email ----------------
+        $('#forgotEmailForm').submit(function (e) {
+            e.preventDefault();
+            $('#emailError').text('');
+
+            $.ajax({
+                url: "{% url 'user:forgot_password' %}",
+                type: 'POST',
+                data: $(this).serialize(),
+                headers: { 'X-CSRFToken': getCookie('csrftoken'), 'X-Requested-With': 'XMLHttpRequest' },
+                success: function (res) {
+                    if (res.success) {
+                        const emailVal = $('#forgotEmailForm input[name="email"]').val();
+                        $('#otpEmail').text(emailVal);
+                        $('#otpEmailInput').val(emailVal);
+                        showStep('otp');
+                        startOtpTimer();
+                    }
+                },
+                error: function (xhr) {
+                    const res = xhr.responseJSON;
+                    $('#emailError').text(res?.error_message || 'Something went wrong.');
+                }
+            });
+        });
+
+        // ---------------- Step 2: Verify OTP ----------------
+        $('#otpForm').submit(function (e) {
+            e.preventDefault();
+            $('#otpError').text('');
+            $('#otpSuccess').text('');
+
+            $.ajax({
+                url: "{% url 'user:forgot_password.verify' %}",
+                type: 'POST',
+                data: $(this).serialize(),
+                headers: { 'X-CSRFToken': getCookie('csrftoken'), 'X-Requested-With': 'XMLHttpRequest' },
+                success: function (res) {
+                    if (res.success) {
+                        clearInterval(countdown);
+                        showStep('reset');
+                    }
+                },
+                error: function (xhr) {
+                    const res = xhr.responseJSON;
+                    $('#otpError').text(res?.error_message || 'Something went wrong.');
+                }
+            });
+        });
+
+        // ---------------- RESEND OTP ----------------
+        $('#resendOtpBtn').click(function () {
+            const email = $('#otpEmailInput').val();
+            $('#otpError').text('');
+            $('#otpSuccess').text('');
+
+            $.ajax({
+                url: "{% url 'user:forgot_password.resend_otp' %}",
+                type: 'POST',
+                data: { email: email },
+                headers: { 'X-CSRFToken': getCookie('csrftoken'), 'X-Requested-With': 'XMLHttpRequest' },
+                success: function (res) {
+                    if (res.success) {
+                        $('#otpSuccess').text('OTP resent successfully!');
+                        startOtpTimer(); 
+                    } else {
+                        $('#otpError').text(res.error_message || 'Failed to resend OTP.');
+                    }
+                },
+                error: function (xhr) {
+                    const res = xhr.responseJSON;
+                    $('#otpError').text(res?.error_message || 'Something went wrong.');
+                }
+            });
+        });
+
+        // ---------------- Step 3: Reset Password ----------------
+        const newPassword = $('#new_password');
+        const confirmPassword = $('#confirm_password');
+        const resetSubmitBtn = $('#resetSubmitBtn');
+        const uppercaseRule = $('#uppercase');
+        const numberRule = $('#number');
+        const matchRule = $('#match');
+
+        function validatePassword() {
+            const password = newPassword.val();
+            const confirm = confirmPassword.val();
+
+            const hasUppercase = /[A-Z]/.test(password);
+            const hasNumber = /\d/.test(password);
+            const passwordsMatch = password && confirm && password === confirm;
+
+            uppercaseRule.toggleClass('valid', hasUppercase);
+            numberRule.toggleClass('valid', hasNumber);
+            matchRule.toggleClass('valid', passwordsMatch);
+
+            resetSubmitBtn.prop('disabled', !(hasUppercase && hasNumber && passwordsMatch));
+        }
+
+        newPassword.on('input', validatePassword);
+        confirmPassword.on('input', validatePassword);
+
+        $('#resetForm').submit(function (e) {
+            e.preventDefault();
+            $('#resetError').text('');
+
+            $.ajax({
+                url: "{% url 'user:forgot_password.reset' %}",
+                type: 'POST',
+                data: $(this).serialize(),
+                headers: { 'X-CSRFToken': getCookie('csrftoken'), 'X-Requested-With': 'XMLHttpRequest' },
+                success: function (res) {
+                    if (res.success) {
+                        $('#passwordModal').removeClass('flex').addClass('hidden');
+                        window.location.href = res.redirect_url;
+                    }
+                },
+                error: function (xhr) {
+                    const res = xhr.responseJSON;
+                    $('#resetError').text(res?.error_message || 'Something went wrong.');
+                }
+            });
+        });
+
+    });
+</script>
+<script>
+  const passwordField = document.getElementById("password");
+  const togglePassword = document.getElementById("togglePassword");
+
+  togglePassword.addEventListener("click", function () {
+    const isPassword = passwordField.type === "password";
+    passwordField.type = isPassword ? "text" : "password";
+
+    this.classList.toggle("fa-eye");
+    this.classList.toggle("fa-eye-slash");
+  });
+</script>
+</body>
+</html>

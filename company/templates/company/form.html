@@ -1,0 +1,846 @@
+{% extends "admin/base.html" %}
+{% load static %}
+{% block style %}
+<style>
+    input.invalid {
+        background-color: #ffdddd;
+    }
+
+    .tab {
+        display: none;
+        background: none !important;
+        background-color: transparent !important;
+        background-image: none !important;
+        border: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    button {
+        background-color: #15e6e6;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        font-size: 17px;
+        font-family: Raleway, sans-serif;
+        cursor: pointer;
+        border-radius: 6px;
+        margin-left: 5px;
+    }
+
+    button:hover {
+        opacity: 0.85;
+    }
+
+    #prevBtn {
+        background-color: #bbb;
+    }
+
+    #submitBtn {
+        background-color: #f44336;
+    }
+
+    #previewBtn {
+        background-color: #15e6e6;
+    }
+
+    .steps-container {
+        text-align: center;
+        margin: 20px 0;
+    }
+
+    .step {
+        margin: 0 4px;
+        padding: 8px 16px;
+        border-radius: 20px;
+        background-color: #bbb;
+        color: white;
+        font-size: 14px;
+        cursor: pointer;
+        opacity: 0.6;
+        display: inline-block;
+        transition: 0.3s;
+    }
+
+    .step.active {
+        opacity: 1;
+        background-color: #15e6e6;
+    }
+
+    .step.finish {
+        background-color: #15e6e6;
+    }
+
+    .companyadreslist {
+        border: 1px rgb(196, 192, 192) solid;
+        border-radius: 5px;
+        padding: 10px;
+    }
+
+    .required::after {
+        content: " *";
+        color: red;
+    }
+
+    /* Sticky footer buttons */
+    .sticky-footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: #fff;
+        /* optional: white background */
+        border-top: 1px solid #ccc;
+        /* optional: separator line */
+        padding: 10px 20px;
+        z-index: 500;
+        box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+        /* subtle shadow */
+    }
+</style>
+ <style>
+.dropzone {
+    border: 2px dashed #6c757d;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    color: #6c757d;
+    cursor: pointer;
+    transition: border-color 0.3s, background-color 0.3s;
+}
+.dropzone.dragover {
+    background-color: #f8f9fa;
+    border-color: #007bff;
+    color: #007bff;
+}
+.dropzone img {
+    max-height: 100px;
+    max-width: 100px;
+    margin-top: 10px;
+    object-fit: contain;
+}
+</style>
+{% endblock %} 
+{% block content %}
+<div class="content-wrapper">
+    <div class="row">
+        <div class="col-12 grid-margin">
+            <div class="card">
+                <div class="card-body">
+                    <div class="col-md-12">
+                        <strong class="card-title heading-size fs-5">Create Company</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 grid-margin">
+            <div class="card">
+                    <div class="card-body">
+                        <div class="col-md-12">
+                            <div class="steps-container">
+                                <span class="step" data-step="0">Company Information</span>
+                                <span class="step" data-step="1">Address Details</span>
+                                <span class="step" data-step="2">Other Information</span>
+                                <span class="step" data-step="3">User Details</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="company-form p-4">
+                        <form id="regForm" method="POST" action="{% if company %} {% url 'company.update' company.id %} {% else %} {% url 'company.store'%} {% endif %}" enctype="multipart/form-data" class="company-form" novalidate>
+                            <input type="hidden" name="company_id" id="company_id" class="company_edit_data" value="{{ company.id }}">
+                            {% csrf_token %}
+                            <div class="tab">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <div class="row">
+                                                <div class="col-md-4 mt-2">
+                                                    <label for="name" style="font-size: var(--label-size);">Company Name:</label>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <input type="text" class="form-control form-control-sm" id="name" name="name"
+                                                        value="{% if company %}{{ company.name }}{% endif %}"  data-original="{{ company.name|default:'' }}" required />
+                                                    <small id="name-exists-error" class="text-danger text-capitalize"></small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <div class="row">
+                                                <div class="col-md-4 mt-2">
+                                                    <label for="print_name" style="font-size: var(--label-size);">Print Name:</label>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <input type="text" class="form-control form-control-sm " id="print_name"
+                                                        name="print_name" placeholder="" {% if company %} value="{{ company.print_name }}" {% endif %} required/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <div class="row">
+                                                <div class="col-md-4 mt-2">
+                                                    <label for="fiscal_year" style="font-size: var(--label-size);">Fiscal Year:</label>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <select data-placeholder="Select Fiscal Year" name="fiscal_year" id="fiscal_year"
+                                                            class="form-control form-control-sm  form-select mySelect" data-error="Fiscal year is required." required>
+                                                        <option value="">Select Fiscal Year</option>
+                                                        {% for year in fiscal %}
+                                                            <option value="{{ year.id }}"
+                                                                {% if company.fiscal_year.id == year.id %}
+                                                                    selected
+                                                                {% elif request.user.company.fiscal_year_id == year.id %}
+                                                                    selected
+                                                                {% endif %}>
+                                                                {{ year.name }}
+                                                            </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                    <div class="invalid-select-data text-danger d-none"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <div class="row">
+                                                <div class="col-md-4 mt-2">
+                                                    <label for="fiscal_year_beginning_from" style="font-size: var(--label-size);">Fiscal Year Beginning:</label>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <input type="text" class="form-control form-control-sm   nepali-date-client" id="fiscal_year_beginning_from"
+                                                        name="fiscal_year_beginning_from" {% if company %} value="{{ company.fiscal_year_beginning_from }}" {% endif %} readonly />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <div class="row">
+                                                <div class="col-md-4 mt-2">
+                                                    <label for="book_commencing_from" style="font-size: var(--label-size);">Book Commencing From:</label>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <input type="text" class="form-control form-control-sm   nepali-date-client" id="book_commencing_from"
+                                                        name="book_commencing_from" {% if company %} value="{{ company.book_commencing_from }}" {% endif %} readonly/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <div class="row">
+                                                <div class="col-md-4 mt-2">
+                                                    <label for="pan" style="font-size: var(--label-size);">PAN:</label>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <input type="number" class="form-control form-control-sm " id="pan" name="pan" {% if company %} value="{{ company.pan }}" {% endif %} data-original="{{ company.pan|default:'' }}" required/>
+                                                    <small id="pan-exists-error" class="text-danger text-capitalize"></small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab">
+                                <div class="row">
+                               <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <div class="row">
+                                            <div class="col-md-4 mt-2">
+                                                <label for="country_name" style="font-size: var(--label-size);">Country:</label>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <select data-placeholder="Select Country" name="country_name" id="country_name" class="form-select mySelect" required>
+                                                    <option value="">Select Country</option>
+                                                    <option value="Nepal" {% if company and company.country_name == 'Nepal' %}selected{% endif %}>Nepal</option>
+                                                    <option value="India" {% if company and company.country_name == 'India' %}selected{% endif %}>India</option>
+                                                    <option value="China" {% if company and company.country_name == 'China' %}selected{% endif %}>China</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <div class="row">
+                                                <div class="col-md-4 mt-2">
+                                                    <label for="province" style="font-size: var(--label-size);">Province:</label>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <select class="form-control form-control-sm  mySelect" id="province"  name="province" required>
+                                                        <option value="">Select Province</option>
+                                                        <option value="Province No. 1" {% if company and company.province == "Province No. 1" %}selected{% endif %}>Province No. 1 (Koshi)</option>
+                                                        <option value="Madhesh Province" {% if company and company.province == "Madhesh Province" %}selected{% endif %}>Madhesh Province</option>
+                                                        <option value="Bagmati Province" {% if company and company.province == "Bagmati Province" %}selected{% endif %}>Bagmati Province</option>
+                                                        <option value="Gandaki Province" {% if company and company.province == "Gandaki Province" %}selected{% endif %}>Gandaki Province</option>
+                                                        <option value="Lumbini Province" {% if company and company.province == "Lumbini Province" %}selected{% endif %}>Lumbini Province</option>
+                                                        <option value="Karnali Province" {% if company and company.province == "Karnali Province" %}selected{% endif %}>Karnali Province</option>
+                                                        <option value="Sudurpashchim Province" {% if company and company.province == "Sudurpashchim Province" %}selected{% endif %}>Sudurpashchim Province</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <div class="row">
+                                                <div class="col-md-4 mt-2">
+                                                    <label for="address" style="font-size: var(--label-size);">Address:</label>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <input type="text" class="form-control form-control-sm " id="address" name="address" {% if company %} value="{{ company.address }}" {% endif %} required />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <div class="row">
+                                                <div class="col-md-4 mt-2">
+                                                    <label for="tel_no" style="font-size: var(--label-size);">Phone Number:</label>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <input type="number" class="form-control form-control-sm " id="tel_no" name="tel_no" {% if company %} value="{{ company.tel_no }}" {% endif %} required/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <div class="row">
+                                                <div class="col-md-4 mt-2">
+                                                    <label for="fax" style="font-size: var(--label-size);">Fax:</label>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <input type="text" class="form-control form-control-sm " id="fax" name="fax" {% if company %} value="{{ company.fax }}" {% endif %}/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <div class="row">
+                                                <div class="col-md-4 mt-2">
+                                                    <label for="currency_string" style="font-size: var(--label-size);">Currency String:</label>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <input type="text" class="form-control form-control-sm " id="currency_string"
+                                                        name="currency_string" {% if company %} value="{{ company.currency_string }}" {% endif %} />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <div class="row">
+                                                <div class="col-md-4 mt-2">
+                                                    <label for="currency_sub_string" style="font-size: var(--label-size);">Currency Sub String:</label>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <input type="text" class="form-control form-control-sm " id="currency_sub_string"
+                                                        name="currency_sub_string" {% if company %} value="{{ company.currency_sub_string }}" {% endif %} />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <div class="row">
+                                                <div class="col-md-4 mt-2">
+                                                    <label for="currency_symbol" style="font-size: var(--label-size);">Currency Symbol:</label>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <input type="text" class="form-control form-control-sm " id="currency_symbol"
+                                                        name="currency_symbol" {% if company %} value="{{ company.currency_symbol }}" {% endif %} />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <div class="row">
+                                                <div class="col-md-4 mt-2">
+                                                    <label for="vat" style="font-size: var(--label-size);">VAT:</label>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <select data-placeholder="Select Vat" name="vat" {% if company %} value="{{ company.vat }}" {% endif %} id="vat" class="form-select mySelect" data-error="VAT is required." required>
+                                                        <option value="">Select Vat</option>
+                                                        <option value="Enabled" {% if company.enable_vat == 1 %}selected{% endif %}>Enabled</option>
+                                                        <option value="Disabled" {% if company.enable_vat == 0 %}selected{% endif %}>Disabled</option>
+                                                    </select>
+                                                    <div class="invalid-select-data text-danger d-none"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <div class="row">
+                                                <div class="col-md-4 mt-2">
+                                                    <label for="register_date" style="font-size: var(--label-size);">Register Date:</label>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <input type="text" class="form-control form-control-sm  nepali-date-client" id="register_date" 
+                                                        name="register_date" {% if company %} value="{{ company.register_date }}" {% endif %} placeholder="" readonly/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <div class="row">
+                                                <div class="col-md-4 mt-2">
+                                                    <label for="vat_rate" style="font-size: var(--label-size);">VAT Rate:</label>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <input type="number" class="form-control form-control-sm " id="vat_rate" name="vat_rate"  value="{% if company %}{{ company.vat_rate }}{% else %}0{% endif %}"  required/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <div class="row">
+                                                <div class="col-md-4 mt-2">
+                                                    <label for="image" style="font-size: var(--label-size);">Upload Logo:</label>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <div id="dropzone" class="dropzone">
+                                                        <p id="dropzoneText">Drag & drop logo here or click to upload</p>
+
+                                                        {% if company.image %}
+                                                            <img id="previewImage" src="{{ company.image.url }}" alt="Logo Preview">
+                                                        {% else %}
+                                                            <img id="previewImage" src="" alt="Logo Preview" style="display:none;">
+                                                        {% endif %}
+
+                                                        <input type="file" accept=".png, .jpg, .jpeg" id="image" name="image" style="display:none;">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <div class="row">
+                                                <div class="col-md-4 mt-2">
+                                                    <label for="email" style="font-size: var(--label-size);">Email Address:<span class="text-danger">*</span></label>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <input type="email" class="form-control form-control-sm " id="email" name="email" {% if company %} value="{{ company.email }}" {% endif %}
+                                                        data-original="{{ company.email|default:'' }}" required>
+                                                        <small id="email-exists-error" class="text-danger text-capitalize"></small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 hidden-place">
+                                        <div class="form-group mb-3">
+                                            <div class="row">
+                                                <div class="col-md-4 mt-2">
+                                                    <label for="username" style="font-size: var(--label-size);">User Name:<span class="text-danger">*</span></label>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <input type="text" class="form-control form-control-sm " id="username" name="username"
+                                                    data-original="{{ company.username|default:'' }}" {% if not company %}required{% endif %}>
+                                                    <small id="username-exists-error" class="text-danger text-capitalize"></small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    {% if not company %}
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <div class="row">
+                                                <div class="col-md-4 mt-2">
+                                                    <label for="password" style="font-size: var(--label-size);">Password:<span class="text-danger">*</span></label>
+                                                </div>
+                                                <div class="col-md-8 position-relative">
+                                                    <input type="password" class="form-control form-control-sm " id="password" name="password" {% if not company %}required{% endif %}>
+                                                    <i class="fas fa-eye fs-5 toggle-password" style="position: absolute; right: 30px; top: 50%; transform: translateY(-50%); cursor: pointer;"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <div class="row">
+                                                <div class="col-md-4 mt-2">
+                                                    <label for="c_password" style="font-size: var(--label-size);">Confirm Password:<span class="text-danger">*</span></label>
+                                                </div>
+                                                <div class="col-md-8 position-relative">
+                                                    <input type="password" class="form-control form-control-sm " id="c_password" name="c_password" {% if not company %}required{% endif %}>
+                                                    <i class="fas fa-eye fs-5 toggle-password" style="position: absolute; right: 30px; top: 50%; transform: translateY(-50%); cursor: pointer;"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="row sticky-footer ">
+                                <div class="col-md-12">
+                                    <div class="d-flex  justify-content-end">
+                                        <button class="btn-submits" type="button" id="prevBtn">Previous</button>
+                                        <button class="btn-submits" type="button" id="nextBtn">Next</button>
+                                        <button class="btn-submits" type="button" id="previewBtn" style="display:none;">Preview</button>
+                                        <button class="btn-submits" type="submit" id="submitBtn" style="display:none;">Submit</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+    </div>
+</div>
+{% endblock %} 
+{% block script %}
+<script src="{% static 'assets/js/realtimevalidation.js' %}"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const dropzone = document.getElementById("dropzone");
+    const fileInput = document.getElementById("image");
+    const previewImage = document.getElementById("previewImage");
+    const dropzoneText = document.getElementById("dropzoneText");
+
+    // Click to open file dialog
+    dropzone.addEventListener("click", () => fileInput.click());
+
+    // Handle file selection
+    fileInput.addEventListener("change", () => handleFile(fileInput.files[0]));
+
+    // Handle drag events
+    dropzone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropzone.classList.add("dragover");
+    });
+
+    dropzone.addEventListener("dragleave", () => {
+        dropzone.classList.remove("dragover");
+    });
+
+    dropzone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dropzone.classList.remove("dragover");
+        const file = e.dataTransfer.files[0];
+        fileInput.files = e.dataTransfer.files;
+        handleFile(file);
+    });
+
+    // Preview image
+    function handleFile(file) {
+        if (file && file.type.startsWith("image/")) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImage.src = e.target.result;
+                previewImage.style.display = "block";
+                dropzoneText.textContent = "Change logo";
+            };
+            reader.readAsDataURL(file);
+        } else {
+            alert("Please upload a valid image (PNG, JPG, JPEG)");
+        }
+    }
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    let currentTab = 0;
+    const tabs = document.querySelectorAll(".tab");
+    const steps = document.querySelectorAll(".step");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const previewBtn = document.getElementById("previewBtn");
+    const submitBtn = document.getElementById("submitBtn");
+    const form = document.getElementById("regForm");
+
+    // Styles for invalid fields and error messages
+    const style = document.createElement("style");
+    style.innerHTML = `
+        .invalid { border: 1px solid red !important; }
+        .error-message { color: red; font-size: 0.8em; display: block; margin-top: 2px; }
+    `;
+    document.head.appendChild(style);
+
+    // Initialize Select2
+    document.querySelectorAll(".select").forEach(select => {
+        $(select).select2({
+            width: "100%",
+            placeholder: select.getAttribute("data-placeholder") || "Select an option",
+            allowClear: true
+        });
+
+        $(select).on("change", function () {
+            if ($(this).val()) {
+                $(this).next(".select2").find(".select2-selection").removeClass("invalid");
+                removeError(this);
+            }
+        });
+    });
+    // Show the current tab
+    function showTab(n) {
+        tabs.forEach((tab, i) => tab.style.display = i === n ? "block" : "none");
+        prevBtn.style.display = n === 0 ? "none" : "inline-block";
+        if (n === tabs.length - 1) {
+            nextBtn.style.display = "none";
+            previewBtn.style.display = "inline-block";
+            submitBtn.style.display = "inline-block";
+        } else {
+            nextBtn.style.display = "inline-block";
+            previewBtn.style.display = "none";
+            submitBtn.style.display = "none";
+        }
+        updateSteps(n);
+    }
+
+    // Update step indicators
+    function updateSteps(n) {
+        steps.forEach((step, i) => {
+            step.classList.remove("active");
+            if (i < n) step.classList.add("finish");
+        });
+        steps[n].classList.add("active");
+    }
+
+    // Show error message
+    function showError(field, message) {
+        removeError(field);
+        const error = document.createElement("span");
+        error.className = "error-message";
+        error.innerText = message;
+        field.parentNode.appendChild(error);
+    }
+
+    // Remove error message
+    function removeError(field) {
+        const parent = field.parentNode;
+        if (parent) {
+            const errors = parent.querySelectorAll(".error-message");
+            errors.forEach(err => err.remove());
+        }
+    }
+    // Validate current tab fields
+    function validateForm(tabIndex = currentTab) {
+        let valid = true;
+        const fields = tabs[tabIndex].querySelectorAll("input[required], select[required], input[type='file'][required]");
+
+        fields.forEach(field => {
+            if (field.tagName === "SELECT") {
+                if (!$(field).val()) {
+                    $(field).next(".select2").find(".select2-selection").addClass("invalid");
+                    showError(field, "This field is required.");
+                    valid = false;
+                } else {
+                    $(field).next(".select2").find(".select2-selection").removeClass("invalid");
+                    removeError(field);
+                }
+            } else if (field.type === "file") {
+                if (!field.files || field.files.length === 0) {
+                    field.classList.add("invalid");
+                    showError(field, "Please upload a file.");
+                    valid = false;
+                } else {
+                    field.classList.remove("invalid");
+                    removeError(field);
+                }
+            } else {
+                if (!field.value.trim()) {
+                    field.classList.add("invalid");
+                    showError(field, "This field is required.");
+                    valid = false;
+                } else {
+                    field.classList.remove("invalid");
+                    removeError(field);
+                }
+            }
+        });
+
+        if (valid) steps[tabIndex].classList.add("finish");
+        return valid;
+    }
+
+    function nextPrev(n) {
+        if (n === 1 && !validateForm()) return false;
+        currentTab += n;
+        if (currentTab >= tabs.length) {
+            form.submit();
+            return false;
+        }
+        showTab(currentTab);
+    }
+
+    // Real-time removal of error messages and invalid class
+    document.querySelectorAll("input[required]").forEach(input => {
+        input.addEventListener("input", () => {
+            if (input.value.trim()) {
+                input.classList.remove("invalid");
+                removeError(input);
+            }
+        });
+    });
+
+    document.querySelectorAll("input[type='file'][required]").forEach(file => {
+        file.addEventListener("change", () => {
+            if (file.files.length > 0) {
+                file.classList.remove("invalid");
+                removeError(file);
+            }
+        });
+    });
+
+    document.querySelectorAll("select[required]").forEach(select => {
+        $(select).on("change", function () {
+            if ($(this).val()) {
+                $(this).next(".select2").find(".select2-selection").removeClass("invalid");
+                removeError(this);
+            }
+        });
+    });
+
+    // Button click events
+    prevBtn.addEventListener("click", () => nextPrev(-1));
+    nextBtn.addEventListener("click", () => nextPrev(1));
+    previewBtn.addEventListener("click", () => alert("Preview form data before submitting!"));
+
+    steps.forEach(step => {
+        step.addEventListener("click", () => {
+            const stepIndex = parseInt(step.dataset.step);
+            if (stepIndex <= currentTab || validateForm()) {
+                currentTab = stepIndex;
+                showTab(currentTab);
+            }
+        });
+    });
+
+    // Validate all tabs on form submit
+    form.addEventListener("submit", e => {
+        let allValid = true;
+        for (let i = 0; i < tabs.length; i++) {
+            if (!validateForm(i)) {
+                allValid = false;
+                currentTab = i;
+                showTab(currentTab);
+                break;
+            }
+        }
+        if (!allValid) e.preventDefault();
+    });
+
+    showTab(currentTab);
+});
+</script>
+<script>
+    $(document).ready(function (){
+        GlobalFormValidation.initFormValidation('.company-form', [
+            {
+                fieldSelector: '#name',
+                url: "{% url 'ajax_loaddata_companyname' %}",
+                errorSelector: '#name-exists-error',
+                key: 'name',
+                originalValue: $('#company_name').data('original'),
+                method: 'GET',
+                extraData: { id: $('#company_id').val() },
+            },
+            {
+                fieldSelector: '#email',
+                url: "{% url 'user:ajax_user_validation_email' %}",
+                errorSelector: '#email-exists-error',
+                key: 'email',
+                originalValue: $('#email').data('original'),
+                method: 'GET',
+                extraData: { id: $('#company_id').val() },
+            },
+            { 
+                fieldSelector: '#username',
+                url: "{% url 'user:ajax_loaddata_username' %}",
+                errorSelector: '#username-exists-error',
+                key: 'username',
+                originalValue: $('#username').data('original'),
+                method: 'GET',
+                extraData: { id: $('#company_id').val() },
+            },
+            { 
+                fieldSelector: '#pan',
+                url: "{% url 'ajax_loaddata_companypan' %}",
+                errorSelector: '#pan-exists-error',
+                key: 'pan',
+                originalValue: $('#pan').data('original'),
+                method: 'GET',
+                extraData: { id: $('#company_id').val() },
+            }
+        ]);
+    })
+</script>
+<script>
+$(document).ready(function () {
+    const isEdit = $('.company_edit_data').val();
+
+    if(isEdit){
+        $('.hidden-place').hide()
+    }
+
+    $('.company-form').submit(function (event) {
+        const password = $('#password').val().trim();
+        const confirmPassword = $('#c_password').val().trim();
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
+
+        if (!isEdit) {
+            if (!password) {
+                Swal.fire({ title: 'Error!', text: 'Password is required.', icon: 'error', confirmButtonText: 'Try again' });
+                $('#password').focus();
+                event.preventDefault();
+                return false;
+            }
+
+            if (!passwordRegex.test(password)) {
+                Swal.fire({ title: 'Error!', text: 'Password must be at least 6 characters, including 1 uppercase, 1 lowercase, and 1 number.', icon: 'error', confirmButtonText: 'Try again' });
+                $('#password').focus();
+                event.preventDefault();
+                return false;
+            }
+
+            if (!confirmPassword) {
+                Swal.fire({ title: 'Error!', text: 'Confirm Password is required.', icon: 'error', confirmButtonText: 'Try again' });
+                $('#c_password').focus();
+                event.preventDefault();
+                return false;
+            }
+
+            if (password !== confirmPassword) {
+                Swal.fire({ title: 'Error!', text: 'Passwords do not match.', icon: 'error', confirmButtonText: 'Try again' });
+                $('#c_password').focus();
+                event.preventDefault();
+                return false;
+            }
+        }
+        return true;
+    });
+
+    $('.toggle-password').click(function () {
+        const input = $(this).closest('.position-relative').find('input');
+        const type = input.attr('type') === 'password' ? 'text' : 'password';
+        input.attr('type', type);
+        $(this).toggleClass('fa-eye-slash');
+    });
+});
+</script>
+
+{% endblock %}

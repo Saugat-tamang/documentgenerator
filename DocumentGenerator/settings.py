@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -37,16 +38,24 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'user',
+    'client',
+    'company',
+    'dashboard',
+    'auditlog'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'dashboard.middleware.ClientMiddleware',
 ]
 
 ROOT_URLCONF = 'DocumentGenerator.urls'
@@ -54,7 +63,7 @@ ROOT_URLCONF = 'DocumentGenerator.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -74,8 +83,12 @@ WSGI_APPLICATION = 'DocumentGenerator.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE'    : 'django.db.backends.mysql',
+        'NAME'      : 'document_generator',
+        'USER'      : 'root',
+        'PASSWORD'  : '',
+        'HOST'      : '127.0.0.1',
+        'PORT'      :' 3306'  
     }
 }
 
@@ -98,7 +111,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+LOGOUT_REDIRECT_URL ='/user/auth/login/'
+AUTH_USER_MODEL = 'user.User'
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
@@ -115,3 +129,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static')
+]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Media files (uploaded files, images)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

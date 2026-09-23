@@ -1,0 +1,141 @@
+{% extends 'admin/base1.html' %}
+{% load static %}
+{% block content %}
+<div class="content-wrapper">
+ <div class="row">
+  <div class="col-12 grid-margin">
+    <div class="card">
+      <div class="card-body">
+        <div class="col-md-12">
+          <strong class="card-title heading-size fs-5">CEO Dashboard — Tax + Finance Summary</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="row">
+    <div class="col-12 grid-margin">
+     
+      <div class="card">
+        <div class="card-body">
+        
+          <div class="row g-3">
+            <div class="col-md-3">
+              <div class="p-3 border rounded box-bg shadow-sm h-100">
+                <div class="text-muted">Revenue</div>
+                <div class="fs-4">NRS {{ revenue|default:0 }}</div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="p-3 border rounded box-bg shadow-sm h-100">
+                <div class="text-muted">Expenses</div>
+                <div class="fs-4">NRS {{ expenses|default:0 }}</div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="p-3 border rounded box-bg shadow-sm h-100">
+                <div class="text-muted">Profit Before Tax</div>
+                <div class="fs-4">NRS {{ profit_before_tax|default:0 }}</div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="p-3 border rounded box-bg shadow-sm h-100">
+                <div class="text-muted">Tax Liability (VAT)</div>
+                <div class="fs-4">NRS {{ tax_liability|default:0 }}</div>
+              </div>
+            </div>
+
+            <div class="col-md-3">
+              <div class="p-3 border rounded box-bg shadow-sm h-100">
+                <div class="text-muted">Effective VAT Rate</div>
+                <div class="fs-4">{{ effective_tax_rate|floatformat:2 }}%</div>
+                <div class="small text-muted">Computed on taxable sales</div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="p-3 border rounded box-bg shadow-sm h-100">
+                <div class="text-muted">Tax Paid-to-Date</div>
+                <div class="fs-4">NRS {{ tax_paid_to_date|default:0 }}</div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="p-3 border rounded box-bg shadow-sm h-100">
+                <div class="text-muted">Upcoming Obligations</div>
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <div class="small text-muted">Latest VAT Period</div>
+                    <div class="fs-6">{{ latest_vat_period }}</div>
+                  </div>
+                  <div class="text-end">
+                    <div class="small text-muted">Amount Due</div>
+                    <div class="fs-6">NRS {{ upcoming_obligation_amount|default:0 }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trends -->
+      <div class="card mt-3">
+        <div class="card-body">
+          <div class="mb-3">
+            <h4 class="card-title mb-0">Trends</h4>
+          </div>
+          <div class="row g-3">
+            <div class="col-md-12 box-bg p-3 shadow-sm rounded">
+              <h6 class="text-muted mb-3">Monthly P&amp;L</h6>
+              <div id="plChart" style="height:360px"></div>
+            </div>
+            <div class="col-md-12 box-bg p-3 shadow-sm rounded">
+              <h6 class="text-muted mb-3">Tax Paid Timeline</h6>
+              <div id="taxPaidChart" style="height:360px"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<script src="{% static 'assets/js/plotdiagram.js' %}"></script>
+<script>
+  async function loadCeoTrends() {
+    try {
+      const res = await fetch('{% url "ceo.monthly.data" %}');
+      const data = await res.json();
+      if (!res.ok) { console.error(data); return; }
+
+      const labels = data.labels || [];
+      const revenue = data.revenue || [];
+      const expenses = data.expenses || [];
+      const profit = data.profit || [];
+      const taxPaid = data.tax_paid || [];
+
+      // P&L chart: grouped bars for revenue/expenses, line for profit
+      const revTrace = { x: labels, y: revenue, type: 'bar', name: 'Revenue', marker: { color: '#2CA02C' } };
+      const expTrace = { x: labels, y: expenses, type: 'bar', name: 'Expenses', marker: { color: '#D62728' } };
+      const pftTrace = { x: labels, y: profit, type: 'scatter', mode: 'lines+markers', name: 'Profit', line: { color: '#1F77B4' } };
+      Plotly.newPlot('plChart', [revTrace, expTrace, pftTrace], {
+        barmode: 'group',
+        margin: { t: 30, r: 10, b: 60, l: 50 },
+        xaxis: { tickangle: -30 },
+        yaxis: { title: 'Amount (NRS)' }
+      }, { responsive: true, displayModeBar: false });
+
+      // Tax Paid timeline: line
+      const taxTrace = { x: labels, y: taxPaid, type: 'scatter', mode: 'lines+markers', name: 'Tax Paid', line: { color: '#9467BD' } };
+      Plotly.newPlot('taxPaidChart', [taxTrace], {
+        margin: { t: 30, r: 10, b: 60, l: 50 },
+        xaxis: { tickangle: -30 },
+        yaxis: { title: 'NRS' }
+      }, { responsive: true, displayModeBar: false});
+    } catch (e) {
+      console.error('Failed to load CEO trends', e);
+    }
+  }
+  document.addEventListener('DOMContentLoaded', loadCeoTrends);
+</script>
+{% endblock %}

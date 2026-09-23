@@ -1,0 +1,147 @@
+{% extends 'admin/base1.html' %}
+{% load static %}
+{% block content %}
+<div class="content-wrapper">
+  <div class="row">
+    <div class="col-12 grid-margin">
+      <div class="card mb-4">
+        <div class="card-body">
+          <div class="col-md-12">
+            <strong class="heading-size fs-5 card-title">Tax Planning Insights</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI Metrics -->
+  <div class="row">
+    <div class="col-12 grid-margin">
+      <div class="card mb-3">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="card-title mb-0">Strategic Tax Planning Insights</h4>
+            <span class="text-muted small">FY-scoped metrics</span>
+          </div>
+
+          <div class="row g-3">
+            <!-- Tax-Saving Utilization -->
+            <div class="col-12 col-md-6">
+              <div class="p-3 rounded box-bg bg-opacity-10 border h-100 shadow-sm">
+                <div class="d-flex align-items-center mb-1">
+                  <span class="fw-semibold">Tax-Saving Utilization</span>
+                </div>
+                <div id="kpiUtil" class="fs-4 fw-bold">—</div>
+                <div class="small text-muted">Claimed vs Eligible ITC</div>
+              </div>
+            </div>
+
+            <!-- Missed Opportunities -->
+            <div class="col-12 col-md-6">
+              <div class="p-3 rounded box-bg bg-opacity-10 border h-100 shadow-sm">
+                <div class="d-flex align-items-center mb-1">
+                  <span class="fw-semibold">Missed Opportunities</span>
+                </div>
+                <div id="kpiMissed" class="fs-4 fw-bold">—</div>
+                <div class="small text-muted">Unutilized eligible ITC (NRS)</div>
+              </div>
+            </div>
+
+            <!-- Tax Efficiency Ratio -->
+            <div class="col-12 col-md-6">
+              <div class="p-3 rounded box-bg bg-opacity-10 border h-100 shadow-sm">
+                <div class="d-flex align-items-center mb-1">
+                  <span class="fw-semibold">Tax Efficiency Ratio</span>
+                </div>
+                <div id="kpiEff" class="fs-4 fw-bold">—</div>
+                <div class="small text-muted">Tax Savings / Taxable Income</div>
+              </div>
+            </div>
+
+            <!-- Board Margin Gain -->
+            <div class="col-12 col-md-6">
+              <div class="p-3 rounded box-bg bg-opacity-10 border h-100 shadow-sm">
+                <div class="d-flex align-items-center mb-1">
+                  <span class="fw-semibold">Board Margin Gain</span>
+                </div>
+                <div id="kpiBmg" class="fs-4 fw-bold">—</div>
+                <div class="small text-muted">Savings / Revenue (proxy)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="fw-bold mb-3">Visualization</h5>
+          <div class="row g-4">
+            <div class="col-md-12">
+              <div class="box-bg border p-3 rounded">
+                <h6 class="text-muted mb-3">Eligible vs Claimed ITC (proxy) and Missed Value</h6>
+                <div id="itcChart" style="height:380px"></div>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="box-bg border p-3 rounded">
+                <h6 class="text-muted mb-3">Tax Efficiency and Tax Paid</h6>
+                <div id="effPaidChart" style="height:380px"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="alert alert-info">
+        <strong>Notes:</strong> Claimed ITC is a same-period proxy = min(eligible purchase VAT, output VAT).
+        For precise timing and depreciation strategies, enable detailed mapping and depreciation schedules.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Plotly -->
+<script src="{% static 'assets/js/plotdiagram.js' %}"></script>
+<script>
+  async function loadKPIs(){
+    const res = await fetch('{% url "tax_planning.metrics" %}');
+    const data = await res.json();
+    if(!res.ok){ console.error(data); return; }
+    const pct = (v)=> (v*100).toFixed(1) + '%';
+    const cur = (v)=> 'NRS ' + (v||0).toLocaleString();
+    document.getElementById('kpiUtil').textContent = pct(data.tax_saving_utilization_rate||0);
+    document.getElementById('kpiMissed').textContent = cur(data.missed_opportunities_value||0);
+    document.getElementById('kpiEff').textContent = pct(data.tax_efficiency_ratio||0);
+    document.getElementById('kpiBmg').textContent = pct(data.board_margin_gain||0);
+  }
+  async function loadSeries(){
+    const res = await fetch('{% url "tax_planning.timeseries" %}');
+    const d = await res.json();
+    if(!res.ok){ console.error(d); return; }
+    const labels = d.labels||[];
+    const eligible = d.eligible_itc||[];
+    const claimed = d.claimed_itc_proxy||[];
+    const missed = d.missed_value||[];
+    const eff = d.tax_efficiency_ratio||[];
+    const paid = d.tax_paid||[];
+
+    Plotly.newPlot('itcChart', [
+      {x:labels,y:eligible,type:'bar',name:'Eligible ITC',marker:{color:'#1f77b4'}},
+      {x:labels,y:claimed,type:'bar',name:'Claimed (proxy)',marker:{color:'#2ca02c'}},
+      {x:labels,y:missed,type:'bar',name:'Missed',marker:{color:'#d62728'}}
+    ], {barmode:'group', margin:{t:30,r:10,b:60,l:50}, xaxis:{tickangle:-30}, yaxis:{title:'NRS'}}, {responsive:true, displayModeBar: false });
+
+    Plotly.newPlot('effPaidChart', [
+      {x:labels,y:eff,type:'scatter',mode:'lines+markers',name:'Tax Efficiency',yaxis:'y2',line:{color:'#9467bd'}},
+      {x:labels,y:paid,type:'bar',name:'Tax Paid',marker:{color:'#17becf'}}
+    ], {
+      margin:{t:30,r:10,b:60,l:50}, xaxis:{tickangle:-30}, 
+      yaxis:{title:'Tax Paid (NRS)'}, 
+      yaxis2:{overlaying:'y', side:'right', title:'Efficiency', tickformat:'.0%'}
+    }, {responsive:true, displayModeBar: false });
+  }
+  document.addEventListener('DOMContentLoaded', ()=>{ loadKPIs(); loadSeries(); });
+</script>
+{% endblock %}

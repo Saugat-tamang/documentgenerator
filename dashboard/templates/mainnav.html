@@ -1,0 +1,60 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'assets/css/tabs.css' %}">
+<style>
+  .tabs-nav {
+    display: flex;
+    flex-wrap: wrap;
+    border-radius: 28px;
+    overflow: hidden;
+  }
+  .tab-button {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+  }
+  .tabicon {
+    margin-left: 8px;
+  }
+  @media (max-width: 768px) {
+    .tabs-nav {
+      flex-direction: column;
+      align-items: center;
+    }
+    .tab-button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+</style>
+<div class="container-fluid">
+    <nav class="tabs-nav" role="tablist" aria-label="Main navigation">
+      <a class="tab-button nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}" 
+         href="{% url 'index' %}" title="Home">
+        <i class="fas fa-home"></i> <span class="tabicon">Home</span>
+      </a>
+      {% if user.is_authenticated and user.is_superuser or user.is_admin %}
+      <a class="tab-button nav-link {% if request.resolver_match.url_name == 'events.create' %}active{% endif %}" 
+         href="{% url 'events.create' %}" title="Create Event">
+        <i class="fas fa-calendar-plus"></i> <span class="tabicon">Event</span>
+      </a>
+      {% endif %}
+      <a class="tab-button nav-link {% if request.resolver_match.url_name == 'bs_calendar' %}active{% endif %}" 
+         href="{% url 'bs_calendar' %}" title="Compliance Calendar">
+        <i class="fas fa-calendar-alt"></i> <span class="tabicon">Calendar</span>
+      </a>
+      {% if user.is_authenticated and user.is_superuser or user.is_admin %}
+      <a class="tab-button nav-link {% if request.resolver_match.url_name == 'notice.create' %}active{% endif %}" 
+         href="{% url 'notice.create' %}" title="Create Notice">
+        <i class="fas fa-bullhorn"></i> <span class="tabicon">Notice</span>
+      </a>
+      <a class="tab-button nav-link {% if request.resolver_match.url_name == 'index.list' %}active{% endif %}" 
+         href="{% url 'index.list' %}" title="Client Dashboard">
+        <i class="fas fa-users-cog"></i> <span class="tabicon">Client Dashboard</span>
+      </a>
+      {% endif %}
+    </nav>
+</div>

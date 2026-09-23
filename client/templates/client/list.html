@@ -1,0 +1,105 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+{% block style %}
+{% include 'admin/tablelink.html' %}
+{% endblock %}
+{% block content %}
+<div class="content-wrapper">
+    <div class="row">
+        <div class="col-12 grid-margin">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mt-2">
+                            <strong class="card-title heading-size fs-5">Client List
+                            </strong>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-end">
+                                <button class="btn custom-btn p-3 dropdown-toggle" type="button" id="reportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-plus-circle"></i> Add Client Details
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list pb-0" aria-labelledby="reportDropdown">
+                                    <a class="dropdown-item preview-item py-3" href="{% url 'client.create' %}">
+                                        <div class="preview-item-content">
+                                            <h6 class="preview-subject fw-normal text-dark mb-1 ms-3">Manually Entries
+                                            </h6>
+                                        </div>
+                                    </a>
+                                    <a class="dropdown-item preview-item py-3" href="{% url 'client.import.create' %}">
+                                        <div class="preview-item-content">
+                                            <h6 class="text-wrap preview-subject fw-normal text-dark mb-1 ms-3">Bulk Import Client
+                                            </h6>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12 grid-margin">
+            <div class="card">
+                <div class="card-body">
+                    <table id="clientTable" class="display responsive nowrap" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>S.N</th>
+                                <th>Name</th>
+                                <th>Address</th>
+                                <th>PAN</th>
+                                <th>Email</th>
+                                <th>Mobile</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block script %}
+{% include 'admin/tablescript.html' %}
+<script>
+$(document).ready(function () {
+    $('#clientTable').DataTable({
+        ajax: "{% url 'client_list_json' %}",
+        processing: true,
+        serverSide: false,
+        responsive: true,
+        columns: [
+            {
+                data: null,
+                render: function (data, type, row, meta) {
+                    return meta.row + 1; 
+                }
+            },
+            { data: 'name' },
+            { data: 'address' },
+            { data: 'pan' },
+            { data: 'email' },
+            { data: 'mobile' },
+            {
+                data: 'id',
+                render: function (data, type, row) {
+                    return `
+                        <a href="/client/edit/${data}/" class="btn btn-sm"><i class="fas fa-edit"></i></a>
+                        <a href="/client/delete/${data}/" class="btn btn-sm text-danger" onclick="return confirm('Are you sure?')"><i class="fas fa-trash-alt"></i></a>
+                    `;
+                },
+                orderable: false,
+                searchable: false
+            }
+        ]
+    });
+});
+</script>
+{% endblock %}

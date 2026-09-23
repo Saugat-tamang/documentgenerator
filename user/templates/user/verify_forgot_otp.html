@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Verify OTP</title>
+  <style>
+    body {
+      background: #f5f7fa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .otp-container {
+      background: white;
+      padding: 2rem 3rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 320px;
+      text-align: center;
+    }
+    h2 {
+      margin-bottom: 1.5rem;
+      color: #333;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #555;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 0.7rem 1rem;
+      font-size: 1rem;
+      border: 1.8px solid #ccc;
+      border-radius: 6px;
+      outline: none;
+      transition: border-color 0.3s;
+      box-sizing: border-box;
+      margin-bottom: 1.2rem;
+    }
+    input[type="text"]:focus {
+      border-color: #007bff;
+      box-shadow: 0 0 6px rgba(0,123,255,0.3);
+    }
+    button {
+      margin-top: 1.8rem;
+      width: auto;           /* Make width fit content */
+      padding: 0.8rem 3.5rem; /* Smaller vertical padding, moderate horizontal */
+      background-color: #171623;
+      border: none;
+      color: white;
+      font-size: 1.2rem;       /* Slightly smaller font */
+      border-radius: 20px;   /* More rounded */
+      cursor: pointer;
+      transition: background-color 0.3s;
+      font-weight: 600;
+    }
+    button:hover {
+      background-color: #312e7a;
+    }
+    .error {
+      color: #ff3b3b;
+      font-weight: 600;
+      margin-top: 1rem;
+    }
+    .timer {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+    }
+    .timer.expired {
+      color: #ff3b3b;
+    }
+  </style>
+</head>
+<body>
+  <div class="otp-container">
+    <h2>Verify OTP</h2>
+    <form method="POST" id="otpForm">
+      {% csrf_token %}
+      <label>Enter OTP sent to {{ email }}:</label>
+      <input type="text" name="otp" required autofocus />
+
+      <!-- Timer display -->
+      <div class="timer" id="timer">Time left: 01:00</div>
+
+      <button type="submit" id="submitBtn">Verify OTP</button>
+    </form>
+    {% if error %}
+      <p class="error">{{ error }}</p>
+    {% endif %}
+  </div>
+
+  <script>
+    // Set total countdown time in seconds
+    let timeLeft = 60; // 1 minute
+
+    const timerEl = document.getElementById('timer');
+    const submitBtn = document.getElementById('submitBtn');
+    const otpForm = document.getElementById('otpForm');
+
+    const countdown = setInterval(() => {
+      let minutes = Math.floor(timeLeft / 60);
+      let seconds = timeLeft % 60;
+      seconds = seconds < 10 ? '0' + seconds : seconds;
+
+      timerEl.textContent = `Time left: ${minutes}:${seconds}`;
+
+      if (timeLeft <= 0) {
+        clearInterval(countdown);
+        timerEl.textContent = 'OTP expired. Please request a new one.';
+        timerEl.classList.add('expired');
+        submitBtn.disabled = true;
+        otpForm.querySelector('input[name="otp"]').disabled = true;
+      }
+
+      timeLeft--;
+    }, 1000);
+  </script>
+</body>
+</html>

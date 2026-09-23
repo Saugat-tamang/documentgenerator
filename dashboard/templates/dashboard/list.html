@@ -1,0 +1,161 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+{% block style %}
+<style>
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .widget-stat {
+    border-radius: 15px;
+    padding: 15px;
+    background-color: #f5f7fb;
+    transition: transform 0.3s ease-in-out;
+    text-align: center;
+    animation: fadeInUp 0.5s ease-in-out;
+  }
+
+  .widget-stat:hover {
+    transform: translateY(-7px);
+    cursor: pointer;
+  }
+
+  .statistics-title {
+    font-size: 1.1rem;
+    font-weight: bold;
+    padding: 12px;
+    border-radius: 10px;
+    background: #1F3BB3;
+    color: white;
+  }
+
+  .widget-stat p {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 12px;
+  }
+
+  .assign-btn {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    text-decoration: none;
+  }
+
+  .search-container {
+    margin-bottom: 20px;
+  }
+
+  .search-container input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #d1d9e6;
+    font-size: 1rem;
+  }
+</style>
+{% include 'admin/tablelink.html' %}
+{% endblock %}
+{% block content %}
+<div class="content-wrapper">
+  <div class="row">
+    <div class="col-12 grid-margin p-0 mb-4">
+      {% include 'mainnav.html' %}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search by client name, username, or address..." class="form-control" />
+        </div>
+    </div>
+  </div>
+
+  <div class="row g-4" id="dashboardContainer">
+  </div>
+  <div id="loadMoreSentinel" class="loader"></div>
+</div>
+{% endblock %}
+{% block script %}
+{% include 'admin/tablescript.html' %}
+<script>
+  (function() {
+    const container = document.getElementById("dashboardContainer");
+    const searchInput = document.getElementById("searchInput");
+    const sentinel = document.getElementById("loadMoreSentinel");
+
+    let nextCursor = null;
+    let loading = false;
+    let currentQuery = "";
+    let reachedEnd = false;
+
+    function cardHTML(item) {
+        return `
+        <div class="col-lg-3 col-md-4 col-sm-6 dashboard-card"
+             data-name="${item.name.toLowerCase()}"
+             data-username="${item.username.toLowerCase()}"
+             data-address="${item.address.toLowerCase()}">
+          <a href="${item.link}" class="text-decoration-none">
+            <div class="widget-stat border text-dark">
+              <h4 class="statistics-title mb-3">${item.name}</h4>
+              <p class="text-capitalize">Username: ${item.username}</p>
+              <p class="text-capitalize">Address: ${item.address}</p>
+              <p>Filing Type: ${item.filing_type}</p>
+              <a href="${item.assign_link}" class="assign-btn btn-primary">
+                <span><i class="fas fa-sync-alt icon-refresh me-1"></i></span>Assign
+              </a>
+            </div>
+          </a>
+        </div>`;
+    }
+
+    async function fetchPage({ cursor=null, q="" } = {}) {
+        if (loading || reachedEnd) return;
+        loading = true;
+
+        const params = new URLSearchParams();
+        params.set("limit", "20");
+        if (cursor) params.set("cursor", cursor);
+        if (q) params.set("q", q);
+
+        const res = await fetch(`/api/clients/?` + params.toString());
+        const data = await res.json();
+
+        if (!cursor) container.innerHTML = "";
+
+        container.insertAdjacentHTML("beforeend", data.items.map(cardHTML).join(""));
+        nextCursor = data.next_cursor;
+        reachedEnd = !nextCursor;
+        loading = false;
+    }
+
+    // Debounced search
+    let t = null;
+    searchInput.addEventListener("input", () => {
+        currentQuery = searchInput.value.trim();
+        nextCursor = null;
+        reachedEnd = false;
+        if (t) clearTimeout(t);
+        t = setTimeout(() => fetchPage({ cursor: null, q: currentQuery }), 250);
+    });
+
+    window.addEventListener('scroll', () => {
+        if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 200) {
+            fetchPage({ cursor: nextCursor, q: currentQuery });
+        }
+    });
+
+    fetchPage();
+})();
+</script>
+{% endblock %}

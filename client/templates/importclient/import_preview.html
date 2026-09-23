@@ -1,0 +1,113 @@
+{% extends 'admin/adminvatdashboard.html' %}
+{% load static %}
+
+{% block style %}
+<style>
+.small-input { width: 100%; padding: 6px 8px; font-size: 0.85rem; border: 1px solid #ccc; border-radius: 3px; box-sizing: border-box; }
+.small-input:focus { outline: none; border-color: #007bff; }
+.input-error { border-color: red !important; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container p-0 mt-4">
+    <strong class="card-title fs-5">Preview Client Data</strong>
+
+    <form method="POST" action="{% url 'clients.import.save' %}">
+        {% csrf_token %}
+        <div class="table-responsive">
+            <table class="table table-bordered mt-3 mb-4" style="min-width: 1400px; table-layout: fixed; width: 100%;">
+               <thead>
+                    <tr>
+                        <th style="width: 5%;">S.N</th>
+                        <th style="width: 15%;">Name</th>
+                        <th style="width: 15%;">Address</th>
+                        <th style="width: 10%;">PAN</th>
+                        <th style="width: 15%;">Tax Office</th>
+                        <th style="width: 10%;">Phone</th>
+                        <th style="width: 10%;">Registration Office</th>
+                        <th style="width: 10%;">VAT Filing Type</th>
+                        <th style="width: 10%;">Client Code</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in data %}
+                    <tr>
+                        <td>{{ row.row }}</td>
+
+                        <td>
+                            <input type="text" name="name_{{ row.row }}" value="{{ row.name }}"
+                                class="small-input {% if row.errors.name %}input-error{% endif %}"
+                                {% if row.errors.name %}data-bs-toggle="tooltip" data-bs-placement="right" title="{{ row.errors.name }}"{% endif %}>
+                        </td>
+
+                        <td>
+                            <input type="text" name="address_{{ row.row }}" value="{{ row.address }}"
+                                class="small-input {% if row.errors.address %}input-error{% endif %}"
+                                {% if row.errors.address %}data-bs-toggle="tooltip" data-bs-placement="right" title="{{ row.errors.address }}"{% endif %}>
+                        </td>
+
+                        <td>
+                            <input type="text" name="pan_{{ row.row }}" value="{{ row.pan }}"
+                                class="small-input {% if row.errors.pan %}input-error{% endif %}"
+                                {% if row.errors.pan %}data-bs-toggle="tooltip" data-bs-placement="right" title="{{ row.errors.pan }}"{% endif %}>
+                        </td>
+
+                        <td>
+                            <select name="tax_office_{{ row.row }}" class="form-control mySelect">
+                                <option value="">Select Tax Office</option>
+                                {% for office in tax_offices %}
+                                    <option value="{{ office.id }}" {% if office.office_name == row.tax_office %}selected{% endif %}>
+                                        {{ office.office_name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </td>
+
+                        <td>
+                            <input type="text" name="phone_{{ row.row }}" value="{{ row.phone }}"
+                                class="small-input {% if row.errors.phone %}input-error{% endif %}"
+                                {% if row.errors.phone %}data-bs-toggle="tooltip" data-bs-placement="right" title="{{ row.errors.phone }}"{% endif %}>
+                        </td>
+
+                        <td>
+                            <input type="text" name="registration_office_{{ row.row }}" value="{{ row.registration_office }}"
+                                class="small-input {% if row.errors.registration_office %}input-error{% endif %}"
+                                {% if row.errors.registration_office %}data-bs-toggle="tooltip" data-bs-placement="right" title="{{ row.errors.registration_office }}"{% endif %}>
+                        </td>
+
+                        <td>
+                            <input type="text" name="vat_type_{{ row.row }}" value="{{ row.vat_type }}"
+                                class="small-input {% if row.errors.vat_type %}input-error{% endif %}"
+                                {% if row.errors.vat_type %}data-bs-toggle="tooltip" data-bs-placement="right" title="{{ row.errors.vat_type }}"{% endif %}>
+                        </td>
+
+                        <td>
+                            <input type="text" name="client_code_{{ row.row }}" value="{{ row.client_code }}"
+                                class="small-input {% if row.errors.client_code %}input-error{% endif %}"
+                                {% if row.errors.client_code %}data-bs-toggle="tooltip" data-bs-placement="right" title="{{ row.errors.client_code }}"{% endif %}>
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="col-12 my-4">
+            <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary">Save Clients</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+});
+</script>
+{% endblock %}

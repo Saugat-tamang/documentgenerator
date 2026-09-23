@@ -1,0 +1,170 @@
+{% extends 'admin/base1.html' %}
+{% load static %}
+{% block style %}
+<style>
+    :root {
+        --primary-color: #2563eb;
+        --transition: all 0.2s ease-in-out;
+    }
+
+    .profile-image {
+        width: clamp(90px, 9vw, 120px);
+        height: clamp(90px, 9vw, 120px);
+        border-radius: 50%;
+        border: 2px solid var(--primary-color);
+        transition: var(--transition);
+    }
+
+    .profile-image:hover {
+        transform: scale(1.03);
+    }
+
+    .profile-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: clamp(0.5rem, 1vw, 0.75rem);
+    }
+
+    .profile-details div {
+        padding: clamp(0.5rem, 1vw, 0.75rem);
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        transition: var(--transition);
+    }
+
+    .profile-details div:hover {
+        background: #f1f3f5;
+    }
+
+    .profile-details strong {
+        display: block;
+        font-size: clamp(0.75rem, 1.2vw + 0.5rem, 0.875rem);
+    }
+
+    .profile-details span {
+        font-size: clamp(0.75rem, 1.2vw + 0.5rem, 0.875rem);
+        color: #1f2937;
+    }
+
+    .collapsible-section h3:hover {
+        background: #e5e7eb;
+    }
+
+    .collapsible-content {
+        display: none;
+        padding: clamp(0.5rem, 1vw, 0.75rem);
+    }
+
+    .collapsible-content.active {
+        display: block;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<section class="content-wrapper">
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-lg-12 profile-sidebar">
+                    <div class="text-center mb-4">
+                        {% if client_registration.profile_picture %}
+                            <img src="{{ client_registration.profile_picture.url }}" alt="Profile Picture" class="profile-image img-fluid mb-3">
+                        {% else %}
+                            <img src="{% static 'assets/images/faces/profile/profile.jpg' %}" alt="Default Profile Picture" class="profile-image img-fluid mb-3">
+                        {% endif %}
+                        <h1 class="fs-5 fw-bold text-primary">{{ client_registration.name|default:"Not Provided" }}</h1>
+                        <p class="text-muted mb-2 fs-6">{{ client_registration.address|default:"Not Provided" }}</p>
+                        <p class="fs-6">{{ client_registration.nature_of_business|default:"No description provided." }}</p>
+                        <div class="gap-2 mb-3">
+                            <button class="btn btn-primary">Edit Profile</button>
+                        </div>
+                    </div>
+                    <div class="profile-details mb-4">
+                        <div>
+                            <strong>Entity Type</strong>
+                            <span>{{ client_registration.entity_type|default:"Not Provided" }}</span>
+                        </div>
+                        <div>
+                            <strong>Phone</strong>
+                            <span>{{ client_registration.mobile|default:"Not Provided" }}</span>
+                        </div>
+                        <div>
+                            <strong>Email</strong>
+                            <span>{{ client_registration.email|default:"Not Provided" }}</span>
+                        </div>
+                        <div>
+                            <strong>Director</strong>
+                            <span>{{ client_registration.managing_director|default:"Not Provided" }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <main class="col-lg-12">
+                    <section class="collapsible-section" aria-expanded="false">
+                        <h3 role="button" tabindex="0" class="collapsible-header fs-6 d-flex justify-content-between align-items-center px-3 py-3 rounded border border-1">
+                                Additional Details
+                                <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                            </h3>
+                        <div class="collapsible-content">
+                            <div class="profile-details">
+                                <div>
+                                    <strong>PAN</strong>
+                                    <span>{{ client_registration.pan|default:"Not Provided" }}</span>
+                                </div>
+                                <div>
+                                    <strong>Client Code</strong>
+                                    <span>{{ client_registration.client_code|default:"Not Provided" }}</span>
+                                </div>
+                                <div>
+                                    <strong>Tax Office</strong>
+                                    <span>{{ client_registration.tax_office|default:"Not Provided" }}</span>
+                                </div>
+                                <div>
+                                    <strong>Tax Reg. No</strong>
+                                    <span>{{ client_registration.tax_registration_no|default:"Not Provided" }}</span>
+                                </div>
+                                <div>
+                                    <strong>VAT Reg. No</strong>
+                                    <span>{{ client_registration.vat_registration_no|default:"Not Provided" }}</span>
+                                </div>
+                                <div>
+                                    <strong>Company Reg. No</strong>
+                                    <span>{{ client_registration.company_registration_no|default:"Not Provided" }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </main>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block script %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.collapsible-section h3').forEach(header => {
+            header.addEventListener('click', toggleCollapsible);
+            header.addEventListener('keydown', e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggleCollapsible.call(header);
+                }
+            });
+        });
+
+        function toggleCollapsible() {
+            const section = this.parentElement;
+            const content = this.nextElementSibling;
+            const icon = this.querySelector('i');
+            const isExpanded = section.getAttribute('aria-expanded') === 'true';
+
+            section.setAttribute('aria-expanded', !isExpanded);
+            content.classList.toggle('active');
+            icon.classList.toggle('fa-chevron-down');
+            icon.classList.toggle('fa-chevron-up');
+        }
+    });
+</script>
+{% endblock %}

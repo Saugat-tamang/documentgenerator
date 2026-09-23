@@ -1,0 +1,51 @@
+{% extends 'admin/base1.html' %}
+{% load static %}
+{% block content %}
+<div class="content-wrapper">
+    <div class="row">
+        <div class="col-12 grid-margin">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mt-3">
+                            <strong class="card-title heading-size fs-6">Tax Filing Status Tracker ({{ fiscal_year }})
+                            </strong>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-end">
+                                <span class="badge bg-primary fs-6 py-3 px-4 rounded">
+                                    Filed {{ filed_count }}/{{ total_months }} &nbsp;&nbsp;/ &nbsp;&nbsp;Pending {{ pending_count }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 grid-margin">
+            <div class="card border-0">
+                <div class="card-body">
+                    <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3">
+                        {% for m in status_rows %}
+                        <div class="col">
+                            <div class="border rounded p-3 d-flex flex-column h-100 position-relative box-bg" style="min-height: 120px;">
+                                <div class="fw-semibold text-primary mb-2 text-center">
+                                    {{ m.name }}
+                                </div>
+                                {% if m.status == 'Filed' %}
+                                    <span class="badge bg-success mt-auto w-100 text-center py-2 rounded">Filed</span>
+                                {% else %}
+                                    <span class="badge bg-primary mt-auto w-100 text-center py-2 rounded">Pending...</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

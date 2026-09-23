@@ -1,0 +1,710 @@
+{% extends 'admin/base1.html' %}
+{% load static %}
+{% block style %}
+<style>
+  .dashboard-card {
+    border: 1px solid #e0e7ff;
+    border-radius: 8px;
+    background-color: #f5f7fb;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+  }
+
+  .dashboard-card:hover {
+    transform: translateY(-4px);
+  }
+
+  .navbar .nav-link,
+  .navbar .dropdown-item {
+    font-size: 20px;
+  }
+
+  .navbar .nav-link,
+  .navbar .dropdown-item {
+    font-size: 20px;
+  }
+
+  .card.hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+</style>
+{% endblock %}
+{% block content %}
+<div class="content-wrapper">
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="home-tab">
+        <div class="tab-content tab-content-basic">
+          <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview">
+          <!-- ===================================================== -->
+          <!--  Navbar Start                                         -->
+          <!-- ===================================================== -->
+          <div class="row mb-2">
+            <div class="col-12">
+              <nav class="navbar navbar-expand-lg border rounded-2" style="border: 1px solid #e0e7ff; background-color: #f5f7fb;">
+                <div>
+                  <!-- Mobile Toggler -->
+                  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+                    aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation" style="border: none;">
+                    <span class="navbar-toggler-icon"></span>
+                  </button>
+          
+                  <!-- Nav Links -->
+                  <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                    <ul class="navbar-nav gap-2 align-items-center">
+          
+                      <!-- Sales -->
+                      <li class="nav-item">
+                        <a class="nav-link px-3 py-2 rounded text-dark mx-2" href="{% url 'salesdata.create' %}">Sales
+                        </a>
+                      </li>
+          
+                      <!-- Purchases -->
+                      <li class="nav-item">
+                        <a class="nav-link px-3 py-2 rounded text-dark" href="{% url 'purchasedata.create' %}">Purchases
+                        </a>
+                      </li>
+                      <!-- Assets Dropdown -->
+                      <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle px-3 py-2 rounded text-dark" href="#" id="assetsDropdown" role="button"
+                          data-bs-toggle="dropdown" aria-expanded="false" style="transition: 0.3s;">
+                          <i class="bi bi-box-seam me-2"></i>Assets
+                        </a>
+                        <ul class="dropdown-menu shadow-sm border-0 rounded-3" aria-labelledby="assetsDropdown">
+                          <li><a class="dropdown-item py-2" href="{% url 'fixassets.create' %}">
+                              <i class="bi bi-pencil-square me-2"></i>Asset Register</a></li>
+                          <li>
+                            <hr class="dropdown-divider">
+                          </li>
+                          <li><a class="dropdown-item py-2" href="{% url 'assetsblock.create' %}">
+                              <i class="bi bi-layers me-2"></i>Asset Category</a></li>
+                        </ul>
+                      </li>
+          
+                      <!-- Expenses Dropdown -->
+                      <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle px-3 py-2 rounded text-dark" href="#" id="expensesDropdown"
+                          role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                          <i class="bi bi-cash-stack me-2"></i>Expenses
+                        </a>
+                        <ul class="dropdown-menu shadow-sm border-0 rounded-3" aria-labelledby="expensesDropdown">
+                          <li><a class="dropdown-item py-2" href="{% url 'expense.create' %}">
+                              <i class="bi bi-plus-circle me-2"></i>Expense Registration</a></li>
+                          <li>
+                            <hr class="dropdown-divider">
+                          </li>
+                          <li><a class="dropdown-item py-2" href="{% url 'expense.list' %}">
+                              <i class="bi bi-card-list me-2"></i>View All Expenses</a></li>
+                        </ul>
+                      </li>
+          
+                      <!-- Contacts Dropdown -->
+                      <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle px-3 py-2 rounded text-dark" href="#" id="contactsDropdown"
+                          role="button" data-bs-toggle="dropdown" aria-expanded="false">Contacts
+                        </a>
+                        <ul class="dropdown-menu shadow-sm border-0 rounded-3" aria-labelledby="contactsDropdown">
+                          <li><a class="dropdown-item py-2" href="{% url 'customer.create' %}">Customer Add</a></li>
+                          <li><a class="dropdown-item py-2" href="{% url 'vendor.create' %}">Vendor Add</a></li>
+                        </ul>
+                      </li>
+          
+                    </ul>
+                  </div>
+                </div>
+              </nav>
+            </div>
+          </div>
+          <!-- ===================================================== -->
+          <!--  Navbar End                                           -->  
+           <div class="row gx-2">
+              <!-- Compliance Dashboard Card -->
+                  <div class="col-12 col-sm-3 col-md-6 col-lg-3 col-xl-3 mb-2">
+                    <a href="{% url 'compliance.dashboard' %}" class="text-decoration-none">
+                      <div class="card dashboard-card h-100">
+                        <div class="card-body d-flex align-items-center">
+                          <div class="d-flex align-items-center justify-content-center me-3">
+                            <i class="fas fa-clipboard-check fs-2 text-primary"></i>
+                          </div>
+                          <div>
+                            <h3 class="card-value mb-0 fs-6 mt-2">Compliance</h3>
+                            <p class="card-label text-muted fs-6 mt-2">Tax filing status</p>
+                          </div>
+                        </div>
+                      </div>
+                    </a>
+                  </div>
+
+                  <!-- Sales Analytics Card -->
+                  <div class="col-12 col-sm-3 col-md-6 col-lg-3 col-xl-3 mb-2">
+                    <a href="{% url 'sales.analytics.overview' %}" class="text-decoration-none">
+                      <div class="card dashboard-card h-100">
+                        <div class="card-body d-flex align-items-center">
+                          <div class="d-flex align-items-center justify-content-center me-3">
+                            <i class="fas fa-chart-line fs-2 text-primary"></i>
+                          </div>
+                          <div>
+                            <h3 class="card-value mb-0 fs-6 mt-2">Sales Analytics</h3>
+                            <p class="card-label text-muted fs-6 mt-2">Trends, anomalies, forecast</p>
+                          </div>
+                        </div>
+                      </div>
+                    </a>
+                  </div>
+
+                  <!-- Stock Manager Card -->
+                  <div class="col-12 col-sm-3 col-md-6 col-lg-3 col-xl-3 mb-2">
+                    <a href="{% url 'stock.analytics' %}" class="text-decoration-none">
+                      <div class="card dashboard-card h-100">
+                        <div class="card-body d-flex align-items-center">
+                          <div class="d-flex align-items-center justify-content-center me-3">
+                            <i class="fas fa-boxes fs-2 text-primary"></i>
+                          </div>
+                          <div>
+                            <h3 class="card-value mb-0 fs-6 mt-2">Stock Manager</h3>
+                            <p class="card-label text-muted fs-6 mt-2">Items: {{ stock_items_count }} | Qty: {{ stock_total_qty }} | OOS: {{ stock_out_count }}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </a>
+                  </div>
+
+                  <!-- Tax Planning Insights Card -->
+                  <div class="col-12 col-sm-3 col-md-6 col-lg-3 col-xl-3 mb-2">
+                    <a href="{% url 'tax_planning.board' %}" class="text-decoration-none">
+                      <div class="card dashboard-card h-100">
+                        <div class="card-body d-flex align-items-center">
+                          <div class="d-flex align-items-center justify-content-center me-3">
+                            <i class="fas fa-lightbulb fs-2 text-primary"></i>
+                          </div>
+                          <div>
+                            <h3 class="card-value mb-0 fs-6 mt-2">Tax Planning</h3>
+                            <p class="card-label text-muted fs-6 mt-2">Insights & Opportunities</p>
+                          </div>
+                        </div>
+                      </div>
+                    </a>
+                  </div>
+
+                  <!-- CEO Dashboard Card -->
+                  <div class="col-12 col-sm-3 col-md-6 col-lg-3 col-xl-3 mb-2">
+                    <a href="{% url 'ceo.dashboard' %}" class="text-decoration-none">
+                      <div class="card dashboard-card h-100">
+                        <div class="card-body d-flex align-items-center">
+                          <div class="d-flex align-items-center justify-content-center me-3">
+                            <i class="fas fa-user-tie fs-2 text-primary"></i>
+                          </div>
+                          <div>
+                            <h3 class="card-value mb-0 fs-6 mt-2">CEO Dashboard</h3>
+                            <p class="card-label text-muted fs-6 mt-2">Tax + Finance Summary</p>
+                          </div>
+                        </div>
+                      </div>
+                    </a>
+                  </div>
+
+                  <!-- Verification Card -->
+                  <div class="col-12 col-sm-3 col-md-6 col-lg-3 col-xl-3 mb-2">
+                    <a href="{% url 'audit.verification' %}" class="text-decoration-none">
+                      <div class="card dashboard-card h-100">
+                        <div class="card-body d-flex align-items-center">
+                          <div class="d-flex align-items-center justify-content-center me-3">
+                            <i class="fas fa-clipboard-check fs-2 text-primary"></i>
+                          </div>
+                          <div>
+                            <h3 class="card-value mb-0 fs-6 mt-2">Verify Bills</h3>
+                            <p class="card-label text-muted fs-6 mt-2">Mark & Submit</p>
+                          </div>
+                        </div>
+                      </div>
+                    </a>
+                  </div>
+
+                  <!-- Records Card -->
+                  <div class="col-12 col-sm-3 col-md-6 col-lg-3 col-xl-3 mb-2">
+                    <a href="{% url 'records.home' %}" class="text-decoration-none">
+                      <div class="card dashboard-card h-100">
+                        <div class="card-body d-flex align-items-center">
+                          <div class="d-flex align-items-center justify-content-center me-3">
+                            <i class="fas fa-folder-open fs-2 text-primary"></i>
+                          </div>
+                          <div>
+                            <h3 class="card-value mb-0 fs-6 mt-2">Records</h3>
+                            <p class="card-label text-muted fs-6 mt-2">Permanent & Temporary</p>
+                          </div>
+                        </div>
+                      </div>
+                    </a>
+                  </div>
+
+                  <!-- Audit Dashboard Card -->
+                  <div class="col-12 col-sm-3 col-md-6 col-lg-3 col-xl-3 mb-2">
+                    <a href="{% url 'audit.dashboard' %}" class="text-decoration-none">
+                      <div class="card dashboard-card h-100">
+                        <div class="card-body d-flex align-items-center">
+                          <div class="d-flex align-items-center justify-content-center me-3">
+                            <i class="fas fa-shield-alt fs-2 text-primary"></i>
+                          </div>
+                          <div>
+                            <h3 class="card-value mb-0 fs-6 mt-2">Audit</h3>
+                            <p class="card-label text-muted fs-6 mt-2">Compliance & Risks</p>
+                          </div>
+                        </div>
+                      </div>
+                    </a>
+                  </div>
+                </div>
+            <div class="row g-1">
+              <div class="col-md-8 mb-4">
+                <!-- Monthly Document Report (inline) -->
+                  <div class="card-body">
+                    <!-- Document Report Section -->
+                    <div class="rounded border mb-4" style="padding: 20px; font-family: Arial, sans-serif; background-color: #f5f7fb;">
+                      <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="card-title mb-0">Monthly Document Report</h4>
+                        <a href="{% url 'documents.monthly' %}" class="btn btn-sm btn-outline-primary">Open FullReport</a>
+                      </div>
+                      <div id="docChartDashboard" style="height:320px;"></div>
+                    </div>
+                    <!-- MIS Section -->
+                    <div class="rounded border  mb-3" style="padding: 20px; font-family: Arial, sans-serif; background-color: #f5f7fb;">
+                      <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="card-title mb-0">Monthly MIS - Purchases</h4>
+                        <a href="{% url 'mis.monthly' %}" class="btn btn-sm btn-outline-primary">Open Full MIS</a>
+                      </div>
+                      <div id="misChartDashboard" style="height:320px;"></div>
+                    </div>
+                    <!-- Statistical Engines Section -->
+                    <div class="rounded border  mb-3" style="padding: 20px; font-family: Arial, sans-serif; background-color: #f5f7fb;">
+                      <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="card-title mb-3">Statistical Engines</h4>
+                        <a href="" class="btn btn-sm btn-outline-secondary">Open Full Tools</a>
+                      </div>
+                    </div>
+                    <!-- Sales Data Section -->
+                    <div class="rounded border  mb-3" style="padding: 20px; font-family: Arial, sans-serif; background-color: #f5f7fb;">
+                      <h4 class="card-title mb-3">VAT Forecast (baseline)</h4>
+                      <div id="statsForecastChart" style="height:260px;"></div>
+                    </div>
+                    <!-- Sales Distribution Section -->
+                    <div class="rounded border  mb-3" style="padding: 20px; font-family: Arial, sans-serif; background-color: #f5f7fb;"">
+                      <h4 class="card-title mb-3">Sales Distribution</h4>
+                      <div id="statsDistributionChart" style="height:260px;"></div>
+                      <div class="small text-muted" id="statsNormNote"></div>
+                    </div>
+                    <!-- KPI Section -->
+                    <div class="rounded border mb-3" style="padding: 20px; font-family: Arial, sans-serif; background-color: #f5f7fb;">
+                      <div id="statsKPIs" class="d-flex flex-wrap gap-3 small text-muted"></div>
+                    </div>
+                    <!-- Purchase Data Section -->
+                    <div class="rounded border" style="padding: 20px; font-family: Arial, sans-serif; background-color: #f5f7fb;">
+                      <div id="salesPurchaseChart" style="width:100%; height:500px;"></div>
+                    </div>
+                  </div>
+              </div>
+              <!--===============================================================  -->
+              <!--   Start start list short                                        -->
+              <!--===============================================================  -->
+              <div class="col-md-4">
+                <div class="card p-2 rounded border" style="height: 99%; overflow-y: auto;">
+                  <!-- Exit Dashboard Card -->
+                  <div class="col-12 col-sm-6 col-md-12 col-lg-12 col-xl-12 mb-2">
+                    <a href="{% if user.is_superuser and user.is_staff %}{% url 'index.list' %}{% else %}{% url 'exit_client_dashboard' %}{% endif %}"
+                      class="text-decoration-none">
+                      <div class="card dashboard-card h-100">
+                        <div class="card-body d-flex align-items-center">
+                          <div class="d-flex align-items-center justify-content-center me-3">
+                            <i class="fas fa-sign-out-alt fs-2 text-danger"></i>
+                          </div>
+                          <div>
+                            <h3 class="card-value mb-0 fs-6 mt-2">Exit Dashboard</h3>
+                            <p class="card-label text-muted fs-6 mt-2">Click Here</p>
+                          </div>
+                        </div>
+                      </div>
+                    </a>
+                  </div>
+
+                  
+                  <!-- Total Revenue Card -->
+                  <div class="col-12 col-sm-6 col-md-12 col-lg-12 col-xl-12 mb-2">
+                    <div class="card dashboard-card h-100">
+                      <div class="card-body d-flex align-items-center">
+                        <div class="d-flex align-items-center justify-content-center me-3">
+                          <i class="fas fa-wallet fs-2 text-primary"></i>
+                        </div>
+                        <div>
+                          <h3 class="card-value mb-0 fs-6 mt-2">Total Revenue</h3>
+                          <p class="card-label text-muted fs-6 mt-2">NRS {{total_sales_amount}}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Total Expenses Card -->
+                  <div class="col-12 col-sm-6 col-md-12 col-lg-12 col-xl-12 mb-2">
+                    <div class="card dashboard-card h-100">
+                      <div class="card-body d-flex align-items-center">
+                        <div class="d-flex align-items-center justify-content-center me-3">
+                          <i class="fas fa-minus-circle fs-2 text-primary"></i>
+                        </div>
+                        <div>
+                          <h3 class="card-value mb-0 fs-6 mt-2">Total Expenses</h3>
+                          <p class="card-label text-muted fs-6 mt-2">NRS {{total_purchase_amount}}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Taxable Sales Card -->
+                  <div class="col-12 col-sm-6 col-md-12 col-lg-12 col-xl-12 mb-2">
+                    <div class="card dashboard-card h-100">
+                      <div class="card-body d-flex align-items-center">
+                        <div class="d-flex align-items-center justify-content-center me-3">
+                          <i class="fas fa-shopping-cart fs-2 text-primary"></i>
+                        </div>
+                        <div>
+                          <h3 class="card-value mb-0 fs-6 mt-2">Taxable Sales</h3>
+                          <p class="card-label text-muted fs-6 mt-2">NRS {{taxable_sales}}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Credit Card -->
+                  <div class="col-12 col-sm-6 col-md-12 col-lg-12 col-xl-12 mb-2">
+                    <div class="card dashboard-card h-100">
+                      <div class="card-body d-flex align-items-center">
+                        <div class="d-flex align-items-center justify-content-center me-3">
+                          <i class="fas fa-credit-card fs-2 text-primary"></i>
+                        </div>
+                        <div>
+                          <h3 class="card-value mb-0 fs-6 mt-2">Credit</h3>
+                          <p class="card-label text-muted fs-6 mt-2">NRS {{total_purchase_tax}}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Tax Payable Card -->
+                  <div class="col-12 col-sm-6 col-md-12 col-lg-12 col-xl-12 mb-2">
+                    <div class="card dashboard-card h-100">
+                      <div class="card-body d-flex align-items-center">
+                        <div class="d-flex align-items-center justify-content-center me-3">
+                          <i class="fas fa-credit-card fs-2 text-primary"></i>
+                        </div>
+                        <div>
+                          <h3 class="card-value mb-0 fs-6 mt-2">Tax Payable</h3>
+                          <p class="card-label text-muted fs-6 mt-2">NRS {{total_sales_tax}}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Taxable Purchase Card -->
+                  <div class="col-12 col-sm-6 col-md-12 col-lg-12 col-xl-12 mb-2">
+                    <div class="card dashboard-card h-100">
+                      <div class="card-body d-flex align-items-center">
+                        <div class="d-flex align-items-center justify-content-center me-3">
+                          <i class="fas fa-receipt fs-2 text-primary"></i>
+                        </div>
+                        <div>
+                          <h3 class="card-value mb-0 fs-6 mt-2">Taxable Purchase</h3>
+                          <p class="card-label text-muted fs-6 mt-2">NRS {{taxable_purchase}}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Last VAT Return Time Card -->
+                  <div class="col-12 col-sm-6 col-md-12 col-lg-12 col-xl-12 mb-2">
+                    <div class="card dashboard-card h-100">
+                      <div class="card-body d-flex align-items-center">
+                        <div class="d-flex align-items-center justify-content-center me-3">
+                          <i class="fas fa-calendar-check fs-2 text-primary"></i>
+                        </div>
+                        <div>
+                          <h3 class="card-value mb-0 fs-6 mt-2">Last VAT Filed</h3>
+                          <p class="card-label text-muted fs-6 mt-2">{{ vat_return_label|default:"N/A" }}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Latest ITC Card -->
+                  <div class="col-12 col-sm-6 col-md-12 col-lg-12 col-xl-12 mb-2">
+                    <div class="card dashboard-card h-100">
+                      <div class="card-body d-flex align-items-center">
+                        <div class="d-flex align-items-center justify-content-center me-3">
+                          <i class="fas fa-file-invoice fs-2 text-primary"></i>
+                        </div>
+                        <div>
+                          <h3 class="card-value mb-0 fs-6 mt-2">Latest ITC</h3>
+                          <p class="card-label text-muted fs-6 mt-2">NRS {{itc_amount}}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- VAT Due Card -->
+                  <div class="col-12 col-sm-6 col-md-12 col-lg-12 col-xl-12 mb-2">
+                    <div class="card dashboard-card h-100">
+                      <div class="card-body d-flex align-items-center">
+                        <div class="d-flex align-items-center justify-content-center me-3">
+                          <i class="fas fa-clock fs-2 text-primary"></i>
+                        </div>
+                        <div>
+                          <h3 class="card-value mb-0 fs-6 mt-2">VAT DUE</h3>
+                          <p class="card-label text-muted fs-6 mt-2">NRS {{net_due}}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+
+                  <!-- TDS By Section (This Month) -->
+                  {% if tds_section_breakdown %}
+                  <div class="col-12 col-sm-12 col-md-6 col-lg-12 col-xl-12 mb-2">
+                    <div class="card dashboard-card h-100">
+                      <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                          <div class="d-flex align-items-center">
+                            <i class="fas fa-layer-group fs-4 text-primary me-3"></i>
+                            <h3 class="card-value mb-0 fs-6 mt-1">TDS by Section (This Month)</h3>
+                          </div>
+                          <div class="text-nowrap">
+                            <a class="small"
+                              href="{% url 'tds.report.monthly.csv' %}?year={{ tds_year }}&month={{ tds_month }}">CSV</a>
+                            <span class="text-muted">·</span>
+                            <a class="small"
+                              href="{% url 'tds.report.monthly.xlsx' %}?year={{ tds_year }}&month={{ tds_month }}">XLSX</a>
+                          </div>
+                        </div>
+                        <ul class="list-group list-group-flush">
+                          {% for row in tds_section_breakdown %}
+                          <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span class="text-muted">Sec {{ row.section__code }}</span>
+                            <span class="fw-semibold">NRS {{ row.total }}</span>
+                          </li>
+                          {% endfor %}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                  {% else %}
+
+
+                  <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 mb-2">
+                    <div class="card dashboard-card h-100">
+                      <div class="card-body d-flex align-items-center">
+                        <div class="d-flex align-items-center justify-content-center me-3">
+                          <i class="fas fa-layer-group fs-4 text-primary"></i>
+                        </div>
+                        <div>
+                          <h3 class="card-value mb-0 fs-6 mt-2">TDS by Section (This Month)</h3>
+                          <p class="card-label text-muted fs-6 mt-2">No TDS booked this month</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {% endif %}
+
+                  <!-- TDS This Month Card -->
+                  <div class="col-12 col-sm-6 col-md-12 col-lg-12 col-xl-12 mb-2">
+                    <a href="{% url 'tds.report.monthly' %}?year={{ tds_year }}&month={{ tds_month }}"
+                      class="text-decoration-none">
+                      <div class="card dashboard-card h-100">
+                        <div class="card-body d-flex align-items-center">
+                          <div class="d-flex align-items-center justify-content-center me-3">
+                            <i class="fas fa-percentage fs-2 text-primary"></i>
+                          </div>
+                          <div>
+                            <h3 class="card-value mb-0 fs-6 mt-2">TDS Deducted (This Month)</h3>
+                            <p class="text-muted fs-6 mt-2">NRS {{ tds_month_total }}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </a>
+                  </div>
+
+                  <!-- Vendor Card -->
+                  <div class="col-12 col-sm-6 col-md-12 col-lg-12 col-xl-12 mb-2">
+                    <div class="card dashboard-card h-100">
+                      <div class="card-body d-flex align-items-center">
+                        <div class="d-flex align-items-center justify-content-center me-3">
+                          <i class="fas fa-briefcase fs-2 text-primary"></i>
+                        </div>
+                        <div>
+                          <h3 class="card-value mb-0 fs-6 mt-2">Vendor</h3>
+                          <p class="card-label text-muted fs-6 mt-2">{{purchase_count}}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Customer Card -->
+                  <div class="col-12 col-sm-6 col-md-12 col-lg-12 col-xl-12 mb-2">
+                    <div class="card dashboard-card h-100">
+                      <div class="card-body d-flex align-items-center">
+                        <div class="d-flex align-items-center justify-content-center me-3">
+                          <i class="fas fa-user-circle fs-2 text-primary"></i>
+                        </div>
+                        <div>
+                          <h3 class="card-value mb-0 fs-6 mt-2">Customer</h3>
+                          <p class="card-label text-muted fs-6 mt-2">{{sales_count}}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- End Customer Card -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="{% static 'assets/js/plotdiagram.js' %}"></script>
+<script>
+  (function () {
+    async function fetchJSON(url) { const r = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } }); if (!r.ok) throw new Error(await r.text()); return await r.json(); }
+    function renderDocChart(rows) {
+      const labels = rows.map(r => r.month);
+      const sales = rows.map(r => r.sales);
+      const purchase = rows.map(r => r.purchase);
+      const sret = rows.map(r => r.sales_return);
+      const pret = rows.map(r => r.purchase_return);
+      const traces = [
+        { x: labels, y: sales, type: 'bar', name: 'Sales' },
+        { x: labels, y: purchase, type: 'bar', name: 'Purchase' },
+        { x: labels, y: sret, type: 'bar', name: 'Sales Return' },
+        { x: labels, y: pret, type: 'bar', name: 'Purchase Return' },
+      ];
+      if (document.getElementById('docChartDashboard')) {
+        Plotly.newPlot('docChartDashboard', traces, { barmode: 'group', legend: { orientation: 'h' }, margin: { t: 30, r: 10, l: 50, b: 50 } }, { responsive: true , displayModeBar: false });
+      }
+    }
+    function renderMisChart(rows) {
+      const labels = rows.map(r => r.month);
+      const normal = rows.map(r => r.normal_amount);
+      const capital = rows.map(r => r.capital_amount);
+      const expense = rows.map(r => r.expense_amount);
+      const traces = [
+        { x: labels, y: normal, type: 'bar', name: 'Normal' },
+        { x: labels, y: capital, type: 'bar', name: 'Capital' },
+        { x: labels, y: expense, type: 'bar', name: 'Expenses' },
+      ];
+      if (document.getElementById('misChartDashboard')) {
+        Plotly.newPlot('misChartDashboard', traces, { barmode: 'group', legend: { orientation: 'h' }, margin: { t: 30, r: 10, l: 50, b: 50 }, yaxis: { title: 'Amount' } }, { responsive: true , displayModeBar: false });
+      }
+    }
+    async function renderStatsCards() {
+      // Forecast VAT (EMA)
+      try {
+        const fc = await fetchJSON('/sales/statistics/forecast/?method=ema&periods=3');
+        const hist = { x: (fc.history || []).map(h => h.month), y: (fc.history || []).map(h => h.value), type: 'scatter', mode: 'lines+markers', name: 'History' };
+        const fut = { x: (fc.forecast || []).map(h => h.month), y: (fc.forecast || []).map(h => h.value), type: 'scatter', mode: 'lines+markers', name: 'Forecast' };
+        if (document.getElementById('statsForecastChart')) {
+          Plotly.newPlot('statsForecastChart', [hist, fut], { margin: { t: 20 }, legend: { orientation: 'h' } }, { responsive: true , displayModeBar: false });
+        }
+      } catch (e) { console.error(e); }
+
+      // Distribution of Sales Total with normal overlay
+      try {
+        const d = await fetchJSON('/sales/statistics/distribution/?field=total_amount');
+        const bins = d.bins || []; const hist = d.hist || [];
+        const centers = bins.slice(0, -1).map((b, i) => (b + bins[i + 1]) / 2);
+        const bar = { x: centers, y: hist, type: 'bar', name: 'Histogram' };
+        const norm = { x: d.normal_x || [], y: d.normal_y || [], type: 'scatter', name: 'Normal PDF' };
+        if (document.getElementById('statsDistributionChart')) {
+          Plotly.newPlot('statsDistributionChart', [bar, norm], { margin: { t: 20 }, legend: { orientation: 'h' } }, { responsive: true , displayModeBar: false });
+        }
+        const note = document.getElementById('statsNormNote');
+        if (note) { note.textContent = (d.shapiro_p !== undefined || d.ks_p !== undefined) ? `Shapiro p=${d.shapiro_p ?? 'n/a'} | KS p=${d.ks_p ?? 'n/a'}` : 'Install SciPy for normality p-values.'; }
+      } catch (e) { console.error(e); }
+
+      // Descriptive KPIs (mean/median of VAT, totals)
+      try {
+        const desc = await fetchJSON('/sales/statistics/descriptive/');
+        const k = document.getElementById('statsKPIs');
+        if (k) {
+          const s = desc.sales || {};
+          function chip(label, obj, key) { const v = obj[key] || {}; return `<span class="badge bg-light text-dark border">${label} μ=${v.mean ?? 'n/a'} | σ=${v.std ?? 'n/a'}</span>`; }
+          k.innerHTML = [
+            chip('Total', s, 'total_amount'),
+            chip('Tax', s, 'tax_amount'),
+            chip('Taxable', s, 'taxable_amount')
+          ].join(' ');
+        }
+      } catch (e) { console.error(e); }
+    }
+    document.addEventListener('DOMContentLoaded', async function () {
+      try {
+        const data = await fetchJSON('/report/documents/monthly/data/');
+        renderDocChart(data.rows || []);
+        const mis = await fetchJSON('/report/mis/monthly/data/');
+        renderMisChart(mis.rows || []);
+        renderStatsCards();
+      } catch (e) { if (window.toastr) toastr.error('Failed to load Monthly Document Report'); console.error(e); }
+    });
+  })();
+</script>
+<script>
+  (async function () {
+    async function fetchJSON(url) {
+      const r = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+      if (!r.ok) throw new Error(await r.text());
+      return await r.json();
+    }
+
+    async function renderSalesPurchaseChart() {
+      const data = await fetchJSON("{% url 'sales_purchase_monthly_data' %}");
+      const rows = data.rows || [];
+
+      const labels = rows.map(r => r.month);
+      const sales = rows.map(r => r.sales);
+      const purchases = rows.map(r => r.purchase);
+      const salesVat = rows.map(r => r.sales_vat);
+      const purchaseVat = rows.map(r => r.purchase_vat);
+
+      const traces = [
+        { x: labels, y: sales, type: 'bar', name: 'Sales', marker: { color: '#1f77b4' } },
+        { x: labels, y: purchases, type: 'bar', name: 'Purchases', marker: { color: '#ff7f0e' } },
+        { x: labels, y: salesVat, type: 'line', name: 'Output VAT', line: { color: '#2ca02c', width: 3 } },
+        { x: labels, y: purchaseVat, type: 'line', name: 'Input VAT', line: { color: '#d62728', width: 3, dash: 'dot' } }
+      ];
+
+      const layout = {
+        barmode: 'group',
+        title: 'Sales vs Purchases with VAT',
+        xaxis: { title: 'Month' },
+        yaxis: {
+          title: 'Amount (NPR)',
+          tickprefix: 'NPR ',
+          tickformat: ',',
+
+        },
+        legend: { orientation: 'h' },
+        margin: { t: 50, r: 20, l: 150, b: 60 }
+      };
+
+      if (document.getElementById('salesPurchaseChart')) {
+        Plotly.newPlot('salesPurchaseChart', traces, layout, { responsive: true , displayModeBar: false });
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', renderSalesPurchaseChart);
+  })();
+</script>
+<footer class="footer">
+  <div class="d-sm-flex justify-content-center justify-content-sm-between">
+    <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">FynCoo</span>
+    <span class="float-none float-sm-end d-block mt-1 mt-sm-0 text-center">Copyright © 2023. All rights
+      reserved.</span>
+  </div>
+</footer>
+{% endblock %}
