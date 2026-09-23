@@ -24,7 +24,7 @@ urlpatterns = [
     path('auth/update/<int:id>/', views.user_update, name='user.update'),
     
     
-    path('auth/logout/', LogoutView.as_view(next_page=settings.LOGOUT_REDIRECT_URL), name='logout'),
+    path('logout/', LogoutView.as_view(next_page=settings.LOGOUT_REDIRECT_URL), name='logout'),
     path('reset_password/', views.reset_password, name='reset_password'),
     path('userdetails', views.userDetails, name='user.details'),
     path('useredit/<int:id>', views.userEdit, name='user.details.edit'),
